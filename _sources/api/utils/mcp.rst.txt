@@ -2,8 +2,9 @@ MCP utilities
 =============
 
 Shared machinery for building MCP servers and clients used by Klea apps:
-metadata schemas, tool registration, an httpx session lifespan, path
-permission checks, and the reusable bundled tools server.
+metadata schemas, tool registration, tool access levels, an httpx session
+lifespan, path permission (discovery, the sensitive-file matcher, and the
+interactive-approval payload/schema), and the reusable bundled tools server.
 
 Schemas
 -------
@@ -33,6 +34,53 @@ Tool call dispatch
    :members:
    :show-inheritance:
 
+Path permissions
+----------------
+
+Layered path discovery, the sensitive-file matcher, and the payload/response
+schema for the interactive allow / deny approval loop (ADR-0007).  The gate
+runs in :mod:`klea_utils.mcp.dispatch` before a tool call reaches the server.
+
+.. automodule:: klea_utils.mcp.path_detect
+   :members:
+   :show-inheritance:
+
+.. automodule:: klea_utils.mcp.sensitive
+   :members:
+   :show-inheritance:
+
+.. automodule:: klea_utils.mcp.permission_hitl
+   :members:
+   :show-inheritance:
+
+Tool access levels
+------------------
+
+.. automodule:: klea_utils.mcp.access
+   :members:
+   :show-inheritance:
+
+Strict-safe call schema
+-----------------------
+
+.. automodule:: klea_utils.mcp.call_schema
+   :members:
+   :show-inheritance:
+
+Privilege guard
+---------------
+
+.. automodule:: klea_utils.mcp.privilege
+   :members:
+   :show-inheritance:
+
+Tool results
+------------
+
+.. automodule:: klea_utils.mcp.tool_result
+   :members:
+   :show-inheritance:
+
 HTTP session lifespan
 ---------------------
 
@@ -58,6 +106,10 @@ their httpx session via the lifespan context.
    :members:
    :show-inheritance:
 
+.. automodule:: klea_utils.mcp.tool_impls.user_agent
+   :members:
+   :show-inheritance:
+
 .. automodule:: klea_utils.mcp.tool_impls.web_fetch
    :members:
    :show-inheritance:
@@ -70,7 +122,95 @@ their httpx session via the lifespan context.
    :members:
    :show-inheritance:
 
+.. automodule:: klea_utils.mcp.tool_impls.find_files
+   :members:
+   :show-inheritance:
+
+.. automodule:: klea_utils.mcp.tool_impls.grep
+   :members:
+   :show-inheritance:
+
+.. automodule:: klea_utils.mcp.tool_impls.walk
+   :members:
+   :show-inheritance:
+
+.. automodule:: klea_utils.mcp.tool_impls.rg_backend
+   :members:
+   :show-inheritance:
+
+.. automodule:: klea_utils.mcp.tool_impls.file_ops
+   :members:
+   :show-inheritance:
+
+.. automodule:: klea_utils.mcp.tool_impls.write_file
+   :members:
+   :show-inheritance:
+
+.. automodule:: klea_utils.mcp.tool_impls.edit_file
+   :members:
+   :show-inheritance:
+
+.. automodule:: klea_utils.mcp.tool_impls.edit_replacers
+   :members:
+   :show-inheritance:
+
 .. automodule:: klea_utils.mcp.tool_impls.download_file
+   :members:
+   :show-inheritance:
+
+.. automodule:: klea_utils.mcp.tool_impls.run_command
+   :members:
+   :show-inheritance:
+
+.. automodule:: klea_utils.mcp.tool_impls.sqlite_query
+   :members:
+   :show-inheritance:
+
+Paper search sources
+--------------------
+
+Framework-agnostic sources that search scholarly APIs and return normalised
+:class:`~klea_utils.mcp.tool_impls.papers.record.PaperRecord` objects.
+:class:`klea_utils.mcp.tool_impls.papers.search.PaperSearchResolver` rotates
+and falls back across them, and the ``search_papers`` bundled tool wraps it.
+
+.. automodule:: klea_utils.mcp.tool_impls.papers.search
+   :members:
+   :show-inheritance:
+
+.. automodule:: klea_utils.mcp.tool_impls.papers.record
+   :members:
+   :show-inheritance:
+
+.. automodule:: klea_utils.mcp.tool_impls.papers.errors
+   :members:
+   :show-inheritance:
+
+.. automodule:: klea_utils.mcp.tool_impls.papers.http
+   :members:
+   :show-inheritance:
+
+.. automodule:: klea_utils.mcp.tool_impls.papers.openalex
+   :members:
+   :show-inheritance:
+
+.. automodule:: klea_utils.mcp.tool_impls.papers.crossref
+   :members:
+   :show-inheritance:
+
+.. automodule:: klea_utils.mcp.tool_impls.papers.semantic_scholar
+   :members:
+   :show-inheritance:
+
+.. automodule:: klea_utils.mcp.tool_impls.papers.europepmc
+   :members:
+   :show-inheritance:
+
+.. automodule:: klea_utils.mcp.tool_impls.papers.pubmed
+   :members:
+   :show-inheritance:
+
+.. automodule:: klea_utils.mcp.tool_impls.papers.arxiv
    :members:
    :show-inheritance:
 

@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../../genindex.html"><link rel="search" title="Search" href="../../../../search.html">
         <link rel="prefetch" href="../../../../_static/klea-logo.png" as="image">
 
-    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
+    <link rel="shortcut icon" href="../../../../_static/klea-logo-notext.png"><!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
         <title>klea_utils.mcp.tool_impls.web_fetch - Klea</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo.css?v=7bdb33bb" />
@@ -187,7 +187,6 @@
     <img class="sidebar-logo" src="../../../../_static/klea-logo.png" alt="Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">Klea</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -206,6 +205,8 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../../../components/index.html">Components</a><input aria-label="Toggle navigation of Components" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../../components/rag.html">Klea RAG</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../components/mcp-servers.html">MCP servers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../components/tools.html">Tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../components/commands.html">Session commands</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../components/web-ui.html">Web interface</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../components/agent.html">Klea Agent</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../components/utils.html">Klea Utils</a></li>
@@ -247,12 +248,13 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../../api/utils/api.html">API</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../../api/utils/ui.html">UI</a><input aria-label="Toggle navigation of UI" class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" role="switch" type="checkbox"/><label for="toctree-checkbox-8"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../api/utils/ui-nicegui.html">UI — NiceGUI</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../api/utils/ui-tui.html">UI — TUI / REPL</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/utils/ui-tui.html">UI - terminal REPL</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../api/utils/ui-cli.html">UI — client CLI</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../api/utils/ui-stores-create.html">UI — store creation CLI</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../api/utils/nodes.html">Nodes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/utils/imports.html">Optional-dependency imports</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../api/utils/paths.html">Path utilities</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../api/utils/plogging.html">Logging</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../api/utils/errors.html">Error types</a></li>
@@ -326,6 +328,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">klea_utils.api.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">_make_retryer_httpx</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">klea_utils.mcp.tool_impls.session</span><span class="w"> </span><span class="kn">import</span> <span class="n">SessionLike</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">klea_utils.mcp.tool_impls.ssrf</span><span class="w"> </span><span class="kn">import</span> <span class="n">_MAX_REDIRECTS</span><span class="p">,</span> <span class="n">check_ssrf_async</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">klea_utils.mcp.tool_impls.user_agent</span><span class="w"> </span><span class="kn">import</span> <span class="n">klea_user_agent</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">klea_utils.paths</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_cache_dir</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
@@ -354,26 +357,19 @@
 <span class="n">_UA_LIST</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="n">_UA_RESOLVED_AT</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
 <span class="n">_UA_LOCK</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
-<span class="n">_honest_user_agent_cache</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_honest_user_agent</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">"""Return the honest client User-Agent, versioned with klea_utils.</span>
+<div class="viewcode-block" id="honest_user_agent">
+<a class="viewcode-back" href="../../../../api/utils/mcp.html#klea_utils.mcp.tool_impls.web_fetch.honest_user_agent">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">honest_user_agent</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Return the honest client User-Agent for web fetches.</span>
 
-<span class="sd">    Reads the installed ``klea_utils`` version from package metadata; falls</span>
-<span class="sd">    back to an unversioned string when metadata is unavailable (e.g. an</span>
-<span class="sd">    editable checkout without installed distribution metadata).</span>
+<span class="sd">    E.g. ``klea-web-fetch/&lt;version&gt;``; shared by the download and repository</span>
+<span class="sd">    tools that reuse this identity (see</span>
+<span class="sd">    :func:`klea_utils.mcp.tool_impls.user_agent.klea_user_agent`).</span>
 <span class="sd">    """</span>
-    <span class="k">global</span> <span class="n">_honest_user_agent_cache</span>
-    <span class="k">if</span> <span class="n">_honest_user_agent_cache</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="kn">from</span><span class="w"> </span><span class="nn">importlib.metadata</span><span class="w"> </span><span class="kn">import</span> <span class="n">PackageNotFoundError</span><span class="p">,</span> <span class="n">version</span>
+    <span class="k">return</span> <span class="n">klea_user_agent</span><span class="p">(</span><span class="n">_HONEST_UA_PREFIX</span><span class="p">)</span></div>
 
-            <span class="n">version_str</span> <span class="o">=</span> <span class="n">version</span><span class="p">(</span><span class="s2">"klea_utils"</span><span class="p">)</span>
-        <span class="k">except</span> <span class="n">PackageNotFoundError</span><span class="p">:</span>
-            <span class="n">version_str</span> <span class="o">=</span> <span class="s2">""</span>
-        <span class="n">_honest_user_agent_cache</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">_HONEST_UA_PREFIX</span><span class="si">}{</span><span class="n">version_str</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s1">'dev'</span><span class="si">}</span><span class="s2">"</span>
-    <span class="k">return</span> <span class="n">_honest_user_agent_cache</span>
 
 
 <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_fetch_user_agents</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
@@ -725,7 +721,7 @@
         <span class="n">ok</span> <span class="o">=</span> <span class="k">await</span> <span class="n">_stream_once</span><span class="p">(</span><span class="n">browser_ua</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">ok</span><span class="p">:</span>
             <span class="c1"># Cloudflare challenge: one retry with the honest client UA.</span>
-            <span class="k">await</span> <span class="n">_stream_once</span><span class="p">(</span><span class="n">_honest_user_agent</span><span class="p">())</span>
+            <span class="k">await</span> <span class="n">_stream_once</span><span class="p">(</span><span class="n">honest_user_agent</span><span class="p">())</span>
 
     <span class="n">retryer</span> <span class="o">=</span> <span class="n">_make_retryer_httpx</span><span class="p">(</span><span class="n">attempts</span><span class="o">=</span><span class="n">retries</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>

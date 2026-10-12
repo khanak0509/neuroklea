@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html"><link rel="search" title="Search" href="../../../search.html">
         <link rel="prefetch" href="../../../_static/klea-logo.png" as="image">
 
-    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
+    <link rel="shortcut icon" href="../../../_static/klea-logo-notext.png"><!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
         <title>klea_utils.api.context - Klea</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=7bdb33bb" />
@@ -187,7 +187,6 @@
     <img class="sidebar-logo" src="../../../_static/klea-logo.png" alt="Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">Klea</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -206,6 +205,8 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../../components/index.html">Components</a><input aria-label="Toggle navigation of Components" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../components/rag.html">Klea RAG</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../components/mcp-servers.html">MCP servers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../components/tools.html">Tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../components/commands.html">Session commands</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../components/web-ui.html">Web interface</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../components/agent.html">Klea Agent</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../components/utils.html">Klea Utils</a></li>
@@ -247,12 +248,13 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../api/utils/api.html">API</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../api/utils/ui.html">UI</a><input aria-label="Toggle navigation of UI" class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" role="switch" type="checkbox"/><label for="toctree-checkbox-8"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/utils/ui-nicegui.html">UI — NiceGUI</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/utils/ui-tui.html">UI — TUI / REPL</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils/ui-tui.html">UI - terminal REPL</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/utils/ui-cli.html">UI — client CLI</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/utils/ui-stores-create.html">UI — store creation CLI</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/utils/nodes.html">Nodes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/utils/imports.html">Optional-dependency imports</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/utils/paths.html">Path utilities</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/utils/plogging.html">Logging</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/utils/errors.html">Error types</a></li>
@@ -306,7 +308,7 @@
 
 <span class="sd">Returns the session context for a chat -- the app-defined projection of</span>
 <span class="sd">*checkpointed graph state* via :meth:`BaseLangGraph.context_snapshot`</span>
-<span class="sd">(ADR-0032) -- so frontends can restore the mode badge / selector on</span>
+<span class="sd">(ADR-0032) -- so frontends can restore the mode selector on</span>
 <span class="sd">hydration without waiting for the next streamed query.</span>
 
 <span class="sd">Design: the mode lives in checkpointed graph state, which is the single</span>
@@ -330,8 +332,13 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">langgraph.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">RunnableConfig</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">Field</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">klea_utils.api.chat_core</span><span class="w"> </span><span class="kn">import</span> <span class="n">_graph_and_store</span><span class="p">,</span> <span class="n">thread_id_for</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">klea_utils.graph.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseLangGraph</span><span class="p">,</span> <span class="n">_normalise_state_snapshot</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">klea_utils.api.chat_common</span><span class="w"> </span><span class="kn">import</span> <span class="n">_graph_and_store</span><span class="p">,</span> <span class="n">thread_id_for</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">klea_utils.api.hitl</span><span class="w"> </span><span class="kn">import</span> <span class="n">_snapshot_interrupts</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">klea_utils.graph.base</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">BaseLangGraph</span><span class="p">,</span>
+    <span class="n">_interrupt_event</span><span class="p">,</span>
+    <span class="n">_normalise_state_snapshot</span><span class="p">,</span>
+<span class="p">)</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -342,10 +349,12 @@
 <span class="w">    </span><span class="sd">"""Create an APIRouter exposing the graph-level ``context`` projection.</span>
 
 <span class="sd">    ``GET /chat/{user_id}/{chat_id}/context``</span>
-<span class="sd">        Return ``{"context": {...}}`` -- the checkpointed session context</span>
-<span class="sd">        projected by the app's ``context_snapshot`` hook -- or</span>
-<span class="sd">        ``{"context": null}`` when the thread has no checkpoint yet (a</span>
-<span class="sd">        chat that never ran a query) or the graph uses no checkpointer.</span>
+<span class="sd">        Return ``{"context": {...}, "pending_interrupt": {...} | null}`` --</span>
+<span class="sd">        the checkpointed session context projected by the app's</span>
+<span class="sd">        ``context_snapshot`` hook, plus any pending HITL interrupt</span>
+<span class="sd">        (ADR-0046) so a reloaded frontend can re-present the ask.  Both are</span>
+<span class="sd">        ``null`` when the thread has no checkpoint yet (a chat that never</span>
+<span class="sd">        ran a query) or the graph uses no checkpointer.</span>
 <span class="sd">    """</span>
     <span class="n">router</span> <span class="o">=</span> <span class="n">APIRouter</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">"/chat"</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s2">"context"</span><span class="p">])</span>
 
@@ -369,7 +378,7 @@
                 <span class="n">user_id</span><span class="p">,</span>
                 <span class="n">chat_id</span><span class="p">,</span>
             <span class="p">)</span>
-            <span class="k">return</span> <span class="p">{</span><span class="s2">"context"</span><span class="p">:</span> <span class="kc">None</span><span class="p">}</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">"context"</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">"pending_interrupt"</span><span class="p">:</span> <span class="kc">None</span><span class="p">}</span>
 
         <span class="n">config</span><span class="p">:</span> <span class="n">RunnableConfig</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"configurable"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"thread_id"</span><span class="p">:</span> <span class="n">thread_id</span><span class="p">}}</span>
         <span class="c1"># ``aget_tuple`` returns None for a thread that never ran.  That is</span>
@@ -380,7 +389,7 @@
             <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
                 <span class="s2">"get_chat_context(</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">): no checkpoint yet"</span><span class="p">,</span> <span class="n">user_id</span><span class="p">,</span> <span class="n">chat_id</span>
             <span class="p">)</span>
-            <span class="k">return</span> <span class="p">{</span><span class="s2">"context"</span><span class="p">:</span> <span class="kc">None</span><span class="p">}</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">"context"</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">"pending_interrupt"</span><span class="p">:</span> <span class="kc">None</span><span class="p">}</span>
 
         <span class="n">snapshot</span> <span class="o">=</span> <span class="k">await</span> <span class="n">graph</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">aget_state</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
         <span class="c1"># ``_normalise_state_snapshot`` keeps this identical to the stream</span>
@@ -388,8 +397,18 @@
         <span class="c1"># a plain dict whatever the state backend renders.</span>
         <span class="n">values</span> <span class="o">=</span> <span class="n">_normalise_state_snapshot</span><span class="p">(</span><span class="n">snapshot</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
         <span class="n">context</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">context_snapshot</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"get_chat_context(</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">): context=</span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="n">user_id</span><span class="p">,</span> <span class="n">chat_id</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">{</span><span class="s2">"context"</span><span class="p">:</span> <span class="n">context</span><span class="p">}</span>
+        <span class="c1"># The same snapshot carries any pending HITL interrupt (ADR-0046), so</span>
+        <span class="c1"># a reloaded frontend can re-present the ask without a second read.</span>
+        <span class="n">interrupts</span> <span class="o">=</span> <span class="n">_snapshot_interrupts</span><span class="p">(</span><span class="n">snapshot</span><span class="p">)</span>
+        <span class="n">interrupt</span> <span class="o">=</span> <span class="n">_interrupt_event</span><span class="p">(</span><span class="n">interrupts</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">""</span><span class="p">)[</span><span class="s2">"data"</span><span class="p">]</span> <span class="k">if</span> <span class="n">interrupts</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+            <span class="s2">"get_chat_context(</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">): context=</span><span class="si">%s</span><span class="s2"> pending_interrupt=</span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span>
+            <span class="n">user_id</span><span class="p">,</span>
+            <span class="n">chat_id</span><span class="p">,</span>
+            <span class="n">context</span><span class="p">,</span>
+            <span class="nb">bool</span><span class="p">(</span><span class="n">interrupts</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">"context"</span><span class="p">:</span> <span class="n">context</span><span class="p">,</span> <span class="s2">"pending_interrupt"</span><span class="p">:</span> <span class="n">interrupt</span><span class="p">}</span>
 
     <span class="k">return</span> <span class="n">router</span></div>
 

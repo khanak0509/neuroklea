@@ -99,16 +99,17 @@ to expose, and whether to allow local or web-facing tools.  Two groups:
   ``local`` (filesystem / process on the host) or ``web`` (interacts with
   external URLs / web APIs).
 * **Domain / functional** groups tools by purpose, for example ``files``,
-  ``code``, ``download``, ``neuroml``, ``neuroml-db``, ``osb``.
+  ``code``, ``download``, ``search``, ``neuroml``, ``neuroml-db``, ``osb``.
 
 Every tool also carries the ``bundled`` tag when it comes from the common
 bundled server, so enabling the whole common set is a single
 ``include_tags: ["bundled"]``.  Specific current assignments::
 
-   bundled  web_fetch, list_files, read_file, download_file, run_command (each also has its scope + functional tags)
+   bundled  web_fetch, web_search, search_papers, list_files, find_files, read_file, grep, write_file, edit_file, download_file, run_command (each also has its scope + functional tags)
 
-   Web scope:   web_fetch (bundled), download_file (bundled, download)
-   Local scope: list_files / read_file (bundled, files),
+   Web scope:   web_fetch (bundled), search_papers (bundled), web_search (bundled, search), download_file (bundled, download)
+   Local scope: list_files / find_files / read_file / grep (bundled, files),
+                write_file / edit_file (bundled, files, destructive),
                 run_command (bundled, code),
                 run_python_code / run_lems_simulation (neuroml, code),
                 create_new_NeuroML_model (neuroml)
@@ -122,8 +123,9 @@ expose"; annotations answer "what effects the tool may have".
 ``run_command`` executes a shell command and is therefore marked
 ``destructive`` + ``open_world``: it is full-mode only (never offered or run
 under ``read_only``, see below), and its optional ``working_directory``
-argument is checked like any other path but does **not** confine the command
-(a shell can ``cd`` elsewhere or use absolute paths).  Commands default to a
+argument is gated like any other path (see Path permissions below) but does
+**not** confine the command (a shell can ``cd`` elsewhere or use absolute
+paths).  Commands default to a
 30-second timeout with a 600-second ceiling, overridable via
 ``KLEA_RUN_COMMAND_MAX_TIMEOUT``.  See ADR-0038 for the design and its
 limits.
@@ -134,11 +136,53 @@ environment variable is set.  This catches accidental root deployments
 (containers default to root); third-party MCP servers are not covered and run
 with whatever privileges they are given.
 
+``grep`` and ``find_files`` search file contents and file paths and are
+marked read-only, so they are available under both access levels.  When the
+optional ``search`` extra is installed (a pinned ripgrep binary built by
+Astral and installed as ``rg``), they use it; otherwise they fall back to an
+in-house walker.  The ripgrep backend honours ``.gitignore`` inside a git
+repository by default; a tool call can pass ``include_ignored: true`` to
+search gitignored files too.  The in-house fallback has no ``.gitignore``
+support, so it searches those files regardless.  Both backends skip
+version-control internals and tool caches (``.git``, ``.venv``,
+``node_modules``, ``__pycache__``, ...) and never follow symlinks out of the
+project.
+
+``write_file`` and ``edit_file`` modify files and are therefore marked
+``destructive``: like ``run_command`` they are full-mode only, and never
+offered or run under ``read_only``.  ``write_file`` creates a file or
+replaces a whole file (creating parent directories); ``edit_file`` replaces an
+exact span of an existing file, requiring the match to be unique unless
+``replace_all`` is set.  When an exact match fails, ``edit_file`` tries a
+bounded replacer chain (line-trimmed, block-anchor, whitespace-normalised,
+indentation-flexible, context-aware) before refusing, and reports which
+matcher fired.  Both tools write atomically and preserve the file's mode,
+line endings and BOM; ``read_file`` accepts ``line_numbers: false`` to return
+raw text suitable for an ``edit_file`` ``old_string``.  See ADR-0039.
+
+The file tools are also defensive about missing or over-filtered input.
+``list_files`` returns the unfiltered listing (with a ``note``) when a
+``pattern`` / ``include_*`` filter matches nothing but the directory is not
+empty, and ``read_file`` / ``edit_file`` return the nearest existing
+directory's entries (``nearby``) plus a ``note`` when the target is missing.
+This keeps an empty filtered result from being mistaken for an empty
+directory, or a typo for a missing project.
+
+``web_search`` performs web discovery over a keyless-first provider pool
+(Tavily, Exa, Parallel and Firecrawl hosted MCP endpoints need no API key;
+Brave and Serper are used only when their key is set).  It is read-only and
+open-world.  Results are normalised to ``title``, ``url``, ``snippet``,
+``published`` and ``score``, with the serving ``provider`` named in the
+response, and a rate-limited or failing provider falls through to the next.
+A key only raises that provider's limits; keys are optional and read from
+the process environment (see ``docs/install.rst``).  See ADR-0048.
+
 The bundled tools server
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-Klea ships a set of common tools (web fetch, file list/read, download)
-as a shared MCP server in ``klea_utils.mcp.server``.  Applications
+Klea ships a set of common tools (web fetch/search, file list/read/search/edit,
+download) as a shared MCP server in ``klea_utils.mcp.server``.  The individual
+bundled tools are indexed on the :doc:`tools` page.  Applications
 auto-launch it as a stdio subprocess by default, so users get the common
 tools with no extra setup; the same server can be run standalone over HTTP
 via the ``klea-mcp`` CLI for remote deployments.
@@ -226,6 +270,26 @@ This is a least-privilege guard for trustworthy tools, not a sandbox: a
 server that misreports its annotations cannot be confined this way.  For
 servers Klea does not author, run them under OS-level isolation (see the
 MCP permissions notes in the development documentation).
+
+Path permissions
+----------------
+
+The agent gates filesystem paths before a tool call is dispatched.  A call
+that would touch a path outside the project directory (the directory the
+server runs in), or a sensitive file inside it (env files, private keys,
+cloud config), pauses the run and asks the user, per path, to allow it
+**once**, allow it **for the session**, or **deny** it.  The ask is shown in
+the web UI and terminal REPL; a session approval is remembered for the chat, and a
+denied path returns a non-halting error so the run continues.  Path discovery
+is layered -- a tool's declared ``checkpaths``, the paths the tool picker
+declares, and heuristics (including the tokens of a shell command) -- with
+each request labelled by its confidence.  The set of sensitive filenames can
+be extended with the comma-separated ``KLEA_SENSITIVE_PATTERNS`` environment
+variable.
+
+This is a consent mechanism, not a sandbox: a tool can ignore its arguments
+and touch any path at runtime, and a standalone ``klea-mcp`` server used by a
+non-Klea client has no gate.  See ADR-0007 for the design and its limits.
 
 .. seealso::
 

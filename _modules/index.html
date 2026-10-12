@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html">
         <link rel="prefetch" href="../_static/klea-logo.png" as="image">
 
-    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
+    <link rel="shortcut icon" href="../_static/klea-logo-notext.png"><!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
         <title>Overview: module code - Klea</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
@@ -187,7 +187,6 @@
     <img class="sidebar-logo" src="../_static/klea-logo.png" alt="Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">Klea</span>
   
 </a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -206,6 +205,8 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="../components/index.html">Components</a><input aria-label="Toggle navigation of Components" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../components/rag.html">Klea RAG</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../components/mcp-servers.html">MCP servers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../components/tools.html">Tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../components/commands.html">Session commands</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../components/web-ui.html">Web interface</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../components/agent.html">Klea Agent</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../components/utils.html">Klea Utils</a></li>
@@ -247,12 +248,13 @@
 <li class="toctree-l3"><a class="reference internal" href="../api/utils/api.html">API</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../api/utils/ui.html">UI</a><input aria-label="Toggle navigation of UI" class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" role="switch" type="checkbox"/><label for="toctree-checkbox-8"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../api/utils/ui-nicegui.html">UI — NiceGUI</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../api/utils/ui-tui.html">UI — TUI / REPL</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/utils/ui-tui.html">UI - terminal REPL</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api/utils/ui-cli.html">UI — client CLI</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api/utils/ui-stores-create.html">UI — store creation CLI</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../api/utils/nodes.html">Nodes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/utils/imports.html">Optional-dependency imports</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../api/utils/paths.html">Path utilities</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../api/utils/plogging.html">Logging</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../api/utils/errors.html">Error types</a></li>
@@ -302,11 +304,15 @@
           <h1>All modules for which code is available</h1>
 <ul><li><a href="fastmcp.html">fastmcp</a></li>
 <li><a href="klea_utils/api/app.html">klea_utils.api.app</a></li>
+<li><a href="klea_utils/api/chat_common.html">klea_utils.api.chat_common</a></li>
 <li><a href="klea_utils/api/chat_core.html">klea_utils.api.chat_core</a></li>
 <li><a href="klea_utils/api/context.html">klea_utils.api.context</a></li>
+<li><a href="klea_utils/api/credentials.html">klea_utils.api.credentials</a></li>
 <li><a href="klea_utils/api/health.html">klea_utils.api.health</a></li>
+<li><a href="klea_utils/api/hitl.html">klea_utils.api.hitl</a></li>
 <li><a href="klea_utils/api/messages.html">klea_utils.api.messages</a></li>
 <li><a href="klea_utils/api/models.html">klea_utils.api.models</a></li>
+<li><a href="klea_utils/api/overrides.html">klea_utils.api.overrides</a></li>
 <li><a href="klea_utils/api/server.html">klea_utils.api.server</a></li>
 <li><a href="klea_utils/api/sessions.html">klea_utils.api.sessions</a></li>
 <li><a href="klea_utils/api/sessions_db.html">klea_utils.api.sessions_db</a></li>
@@ -315,6 +321,8 @@
 <li><a href="klea_utils/biblio/docling.html">klea_utils.biblio.docling</a></li>
 <li><a href="klea_utils/biblio/doi.html">klea_utils.biblio.doi</a></li>
 <li><a href="klea_utils/biblio/extract.html">klea_utils.biblio.extract</a></li>
+<li><a href="klea_utils/biblio/models.html">klea_utils.biblio.models</a></li>
+<li><a href="klea_utils/biblio/normalize.html">klea_utils.biblio.normalize</a></li>
 <li><a href="klea_utils/biblio/pdf.html">klea_utils.biblio.pdf</a></li>
 <li><a href="klea_utils/biblio/regex.html">klea_utils.biblio.regex</a></li>
 <li><a href="klea_utils/errors.html">klea_utils.errors</a></li>
@@ -322,17 +330,39 @@
 <li><a href="klea_utils/graph/context.html">klea_utils.graph.context</a></li>
 <li><a href="klea_utils/graph/reducers.html">klea_utils.graph.reducers</a></li>
 <li><a href="klea_utils/graph/schemas.html">klea_utils.graph.schemas</a></li>
+<li><a href="klea_utils/imports.html">klea_utils.imports</a></li>
 <li><a href="klea_utils/llm.html">klea_utils.llm</a></li>
+<li><a href="klea_utils/mcp/access.html">klea_utils.mcp.access</a></li>
+<li><a href="klea_utils/mcp/call_schema.html">klea_utils.mcp.call_schema</a></li>
 <li><a href="klea_utils/mcp/dispatch.html">klea_utils.mcp.dispatch</a></li>
 <li><a href="klea_utils/mcp/errors.html">klea_utils.mcp.errors</a></li>
 <li><a href="klea_utils/mcp/lifespan.html">klea_utils.mcp.lifespan</a></li>
+<li><a href="klea_utils/mcp/path_detect.html">klea_utils.mcp.path_detect</a></li>
+<li><a href="klea_utils/mcp/permission_hitl.html">klea_utils.mcp.permission_hitl</a></li>
+<li><a href="klea_utils/mcp/privilege.html">klea_utils.mcp.privilege</a></li>
 <li><a href="klea_utils/mcp/registry.html">klea_utils.mcp.registry</a></li>
 <li><a href="klea_utils/mcp/schemas.html">klea_utils.mcp.schemas</a></li>
+<li><a href="klea_utils/mcp/sensitive.html">klea_utils.mcp.sensitive</a></li>
 <li><a href="klea_utils/mcp/server/bundled.html">klea_utils.mcp.server.bundled</a></li>
 <li><a href="klea_utils/mcp/server/bundled_tools.html">klea_utils.mcp.server.bundled_tools</a></li>
 <li><a href="klea_utils/mcp/server/config.html">klea_utils.mcp.server.config</a></li>
 <li><a href="klea_utils/mcp/tool_impls/download_file.html">klea_utils.mcp.tool_impls.download_file</a></li>
+<li><a href="klea_utils/mcp/tool_impls/edit_file.html">klea_utils.mcp.tool_impls.edit_file</a></li>
+<li><a href="klea_utils/mcp/tool_impls/edit_replacers.html">klea_utils.mcp.tool_impls.edit_replacers</a></li>
+<li><a href="klea_utils/mcp/tool_impls/file_ops.html">klea_utils.mcp.tool_impls.file_ops</a></li>
+<li><a href="klea_utils/mcp/tool_impls/find_files.html">klea_utils.mcp.tool_impls.find_files</a></li>
+<li><a href="klea_utils/mcp/tool_impls/grep.html">klea_utils.mcp.tool_impls.grep</a></li>
 <li><a href="klea_utils/mcp/tool_impls/list_files.html">klea_utils.mcp.tool_impls.list_files</a></li>
+<li><a href="klea_utils/mcp/tool_impls/papers/arxiv.html">klea_utils.mcp.tool_impls.papers.arxiv</a></li>
+<li><a href="klea_utils/mcp/tool_impls/papers/crossref.html">klea_utils.mcp.tool_impls.papers.crossref</a></li>
+<li><a href="klea_utils/mcp/tool_impls/papers/errors.html">klea_utils.mcp.tool_impls.papers.errors</a></li>
+<li><a href="klea_utils/mcp/tool_impls/papers/europepmc.html">klea_utils.mcp.tool_impls.papers.europepmc</a></li>
+<li><a href="klea_utils/mcp/tool_impls/papers/http.html">klea_utils.mcp.tool_impls.papers.http</a></li>
+<li><a href="klea_utils/mcp/tool_impls/papers/openalex.html">klea_utils.mcp.tool_impls.papers.openalex</a></li>
+<li><a href="klea_utils/mcp/tool_impls/papers/pubmed.html">klea_utils.mcp.tool_impls.papers.pubmed</a></li>
+<li><a href="klea_utils/mcp/tool_impls/papers/record.html">klea_utils.mcp.tool_impls.papers.record</a></li>
+<li><a href="klea_utils/mcp/tool_impls/papers/search.html">klea_utils.mcp.tool_impls.papers.search</a></li>
+<li><a href="klea_utils/mcp/tool_impls/papers/semantic_scholar.html">klea_utils.mcp.tool_impls.papers.semantic_scholar</a></li>
 <li><a href="klea_utils/mcp/tool_impls/permission.html">klea_utils.mcp.tool_impls.permission</a></li>
 <li><a href="klea_utils/mcp/tool_impls/read_file.html">klea_utils.mcp.tool_impls.read_file</a></li>
 <li><a href="klea_utils/mcp/tool_impls/repositories/biomodels.html">klea_utils.mcp.tool_impls.repositories.biomodels</a></li>
@@ -340,13 +370,21 @@
 <li><a href="klea_utils/mcp/tool_impls/repositories/errors.html">klea_utils.mcp.tool_impls.repositories.errors</a></li>
 <li><a href="klea_utils/mcp/tool_impls/repositories/figshare.html">klea_utils.mcp.tool_impls.repositories.figshare</a></li>
 <li><a href="klea_utils/mcp/tool_impls/repositories/github.html">klea_utils.mcp.tool_impls.repositories.github</a></li>
+<li><a href="klea_utils/mcp/tool_impls/rg_backend.html">klea_utils.mcp.tool_impls.rg_backend</a></li>
+<li><a href="klea_utils/mcp/tool_impls/run_command.html">klea_utils.mcp.tool_impls.run_command</a></li>
 <li><a href="klea_utils/mcp/tool_impls/session.html">klea_utils.mcp.tool_impls.session</a></li>
+<li><a href="klea_utils/mcp/tool_impls/sqlite_query.html">klea_utils.mcp.tool_impls.sqlite_query</a></li>
 <li><a href="klea_utils/mcp/tool_impls/ssrf.html">klea_utils.mcp.tool_impls.ssrf</a></li>
+<li><a href="klea_utils/mcp/tool_impls/user_agent.html">klea_utils.mcp.tool_impls.user_agent</a></li>
+<li><a href="klea_utils/mcp/tool_impls/walk.html">klea_utils.mcp.tool_impls.walk</a></li>
 <li><a href="klea_utils/mcp/tool_impls/web_fetch.html">klea_utils.mcp.tool_impls.web_fetch</a></li>
+<li><a href="klea_utils/mcp/tool_impls/write_file.html">klea_utils.mcp.tool_impls.write_file</a></li>
+<li><a href="klea_utils/mcp/tool_result.html">klea_utils.mcp.tool_result</a></li>
 <li><a href="klea_utils/models_catalog.html">klea_utils.models_catalog</a></li>
 <li><a href="klea_utils/nodes/abstract.html">klea_utils.nodes.abstract</a></li>
 <li><a href="klea_utils/nodes/answer_general.html">klea_utils.nodes.answer_general</a></li>
 <li><a href="klea_utils/nodes/base.html">klea_utils.nodes.base</a></li>
+<li><a href="klea_utils/nodes/context.html">klea_utils.nodes.context</a></li>
 <li><a href="klea_utils/nodes/fixed_answer.html">klea_utils.nodes.fixed_answer</a></li>
 <li><a href="klea_utils/nodes/guard.html">klea_utils.nodes.guard</a></li>
 <li><a href="klea_utils/nodes/guard_router.html">klea_utils.nodes.guard_router</a></li>
@@ -355,17 +393,22 @@
 <li><a href="klea_utils/nodes/tools_picker.html">klea_utils.nodes.tools_picker</a></li>
 <li><a href="klea_utils/paths.html">klea_utils.paths</a></li>
 <li><a href="klea_utils/plogging.html">klea_utils.plogging</a></li>
+<li><a href="klea_utils/stores/chunk_worker.html">klea_utils.stores.chunk_worker</a></li>
 <li><a href="klea_utils/stores/config.html">klea_utils.stores.config</a></li>
 <li><a href="klea_utils/stores/filters.html">klea_utils.stores.filters</a></li>
 <li><a href="klea_utils/stores/ingestion.html">klea_utils.stores.ingestion</a></li>
 <li><a href="klea_utils/stores/langchain_bm25.html">klea_utils.stores.langchain_bm25</a></li>
 <li><a href="klea_utils/stores/map_lint.html">klea_utils.stores.map_lint</a></li>
+<li><a href="klea_utils/stores/postcheck.html">klea_utils.stores.postcheck</a></li>
+<li><a href="klea_utils/stores/precheck.html">klea_utils.stores.precheck</a></li>
+<li><a href="klea_utils/stores/query_schema.html">klea_utils.stores.query_schema</a></li>
 <li><a href="klea_utils/stores/retrieval/base.html">klea_utils.stores.retrieval.base</a></li>
 <li><a href="klea_utils/stores/retrieval/bm25.html">klea_utils.stores.retrieval.bm25</a></li>
 <li><a href="klea_utils/stores/retrieval/vs.html">klea_utils.stores.retrieval.vs</a></li>
 <li><a href="klea_utils/stores/utils.html">klea_utils.stores.utils</a></li>
 <li><a href="klea_utils/tools.html">klea_utils.tools</a></li>
 <li><a href="klea_utils/ui/cli.html">klea_utils.ui.cli</a></li>
+<li><a href="klea_utils/ui/inspect_format.html">klea_utils.ui.inspect_format</a></li>
 <li><a href="klea_utils/ui/linkify.html">klea_utils.ui.linkify</a></li>
 <li><a href="klea_utils/ui/stores_create.html">klea_utils.ui.stores_create</a></li>
 <li><a href="klea_utils/ui/tui/repl.html">klea_utils.ui.tui.repl</a></li>
@@ -374,11 +417,14 @@
 <li><a href="klea_utils/ui/web/nicegui/components/chat_area.html">klea_utils.ui.web.nicegui.components.chat_area</a></li>
 <li><a href="klea_utils/ui/web/nicegui/components/chat_bubble.html">klea_utils.ui.web.nicegui.components.chat_bubble</a></li>
 <li><a href="klea_utils/ui/web/nicegui/components/chat_list.html">klea_utils.ui.web.nicegui.components.chat_list</a></li>
+<li><a href="klea_utils/ui/web/nicegui/components/choice.html">klea_utils.ui.web.nicegui.components.choice</a></li>
 <li><a href="klea_utils/ui/web/nicegui/components/context.html">klea_utils.ui.web.nicegui.components.context</a></li>
+<li><a href="klea_utils/ui/web/nicegui/components/footer.html">klea_utils.ui.web.nicegui.components.footer</a></li>
 <li><a href="klea_utils/ui/web/nicegui/components/header.html">klea_utils.ui.web.nicegui.components.header</a></li>
 <li><a href="klea_utils/ui/web/nicegui/components/initial_load.html">klea_utils.ui.web.nicegui.components.initial_load</a></li>
 <li><a href="klea_utils/ui/web/nicegui/components/input_area.html">klea_utils.ui.web.nicegui.components.input_area</a></li>
 <li><a href="klea_utils/ui/web/nicegui/components/inspector.html">klea_utils.ui.web.nicegui.components.inspector</a></li>
+<li><a href="klea_utils/ui/web/nicegui/components/inspector_code.html">klea_utils.ui.web.nicegui.components.inspector_code</a></li>
 <li><a href="klea_utils/ui/web/nicegui/components/model_dialog.html">klea_utils.ui.web.nicegui.components.model_dialog</a></li>
 <li><a href="klea_utils/ui/web/nicegui/components/status_pane.html">klea_utils.ui.web.nicegui.components.status_pane</a></li>
 <li><a href="klea_utils/ui/web/nicegui/components/storage.html">klea_utils.ui.web.nicegui.components.storage</a></li>

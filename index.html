@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="Installation" href="install.html">
         <link rel="prefetch" href="_static/klea-logo.png" as="image">
 
-    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
+    <link rel="shortcut icon" href="_static/klea-logo-notext.png"><!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
         <title>Klea</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
@@ -188,7 +188,6 @@
     <img class="sidebar-logo" src="_static/klea-logo.png" alt="Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">Klea</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -207,6 +206,8 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="components/index.html">Components</a><input aria-label="Toggle navigation of Components" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="components/rag.html">Klea RAG</a></li>
 <li class="toctree-l2"><a class="reference internal" href="components/mcp-servers.html">MCP servers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="components/tools.html">Tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="components/commands.html">Session commands</a></li>
 <li class="toctree-l2"><a class="reference internal" href="components/web-ui.html">Web interface</a></li>
 <li class="toctree-l2"><a class="reference internal" href="components/agent.html">Klea Agent</a></li>
 <li class="toctree-l2"><a class="reference internal" href="components/utils.html">Klea Utils</a></li>
@@ -248,12 +249,13 @@
 <li class="toctree-l3"><a class="reference internal" href="api/utils/api.html">API</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="api/utils/ui.html">UI</a><input aria-label="Toggle navigation of UI" class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" role="switch" type="checkbox"/><label for="toctree-checkbox-8"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="api/utils/ui-nicegui.html">UI — NiceGUI</a></li>
-<li class="toctree-l4"><a class="reference internal" href="api/utils/ui-tui.html">UI — TUI / REPL</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/utils/ui-tui.html">UI - terminal REPL</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/utils/ui-cli.html">UI — client CLI</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/utils/ui-stores-create.html">UI — store creation CLI</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="api/utils/nodes.html">Nodes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utils/imports.html">Optional-dependency imports</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/utils/paths.html">Path utilities</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/utils/plogging.html">Logging</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/utils/errors.html">Error types</a></li>
@@ -359,8 +361,12 @@ and domain-scoped metadata filters</p></li>
 planning, coding, pipeline execution, and analysis</p></li>
 <li><p>General and Scientific operating modes, with chat-versus-task routing and a
 planner – Scientific mode awaits a curated knowledge source</p></li>
-<li><p>A human plan-review step, currently auto-approved; interactive pause/resume
-is pending</p></li>
+<li><p>Human-in-the-loop: a run can pause for an explicit plan approval/revision,
+a blocked step’s questions, or a per-path allow/deny decision before a tool
+touches a file outside the project directory (or a sensitive file inside
+it), then resume the same run with its state intact</p></li>
+<li><p>Dependency-aware plan execution: independent steps run together in parallel,
+while a step that needs an earlier step’s result waits for it</p></li>
 <li><p>Capabilities supplied by MCP tools rather than hard-coded, so the agent
 extends as tools are added</p></li>
 <li><p>Tool access levels (<code class="docutils literal notranslate"><span class="pre">read_only</span></code> / <code class="docutils literal notranslate"><span class="pre">full</span></code>) and sandboxed command execution
@@ -368,11 +374,14 @@ with a wall-clock backstop</p></li>
 </ul>
 <p><strong>Interfaces and models</strong></p>
 <ul class="simple">
-<li><p>CLI, FastAPI server, NiceGUI web UI, Streamlit, and TUI</p></li>
+<li><p>CLI/REPL, FastAPI server, NiceGUI web UI, and Streamlit (a full Textual
+TUI is planned)</p></li>
 <li><p>Bring-your-own LLM: OpenAI-compatible, Anthropic, HuggingFace, and custom
 endpoints, with runtime model switching and prompt caching</p></li>
-<li><p>NeuroML MCP tools: model validation, OSB and NeuroML-DB lookups, web search,
-and sandboxed code execution</p></li>
+<li><p>NeuroML MCP tools: model validation, OSB and NeuroML-DB lookups, and
+sandboxed code execution</p></li>
+<li><p>Bundled tools: web fetch and web search, file read/list/search/edit,
+downloads, and shell commands</p></li>
 </ul>
 </section>
 <section id="quickstart">

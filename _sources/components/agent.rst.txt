@@ -45,14 +45,23 @@ state machine.  In outline:
    takes this short path; everything else is planned.
 2. **Plan** -- the Planner writes the goal and an ordered plan, and never
    answers the user directly.
-3. **Review** -- the plan can pause for human review.  The review step
-   currently auto-approves (a canned approval); real interactivity
-   (LangGraph interrupt/resume) is pending.
-4. **Work loop** -- for each step the tools picker selects tools, the tool
-   caller dispatches them (in parallel), and a deterministic triage router
-   plus an operational evaluator decide whether to retry the step, replan,
-   or move on.  If the picker finds no suitable tool, the plan is
-   revised rather than looping.
+3. **Review and clarification** -- the run can pause for human input and
+   resume the same run with its state intact (LangGraph interrupt/resume).
+   A plan can be presented for an explicit approve/revision decision (a
+   revision returns the feedback to the Planner), and a plan that needs a
+   missing fact asks the questions its blocked step carries.
+4. **Work loop** -- the plan is a dependency graph: independent steps run
+   together in a batch, while a step that needs an earlier step's result waits
+   for it.  The tools picker binds the arguments for the batch, the tool caller
+   dispatches them concurrently (except calls that touch the same file, which
+   run in order), and a deterministic triage router plus an operational
+   evaluator decide, per step, whether to retry the step, replan, or move on.
+   If the picker finds no suitable tool, the plan is revised rather than
+   looping.  Before dispatch, a call that would touch a path outside the
+   project directory -- or a sensitive file inside it, such as ``.env`` --
+   pauses for a per-path allow-once / allow-for-session / deny decision; a
+   denied path returns a non-halting error and the run continues (see
+   :doc:`mcp-servers`).
 5. **Answer** -- once the plan is done, the answer is composed from the
    step results and delivered.
 
@@ -62,14 +71,42 @@ Memory
 Conversation history is summarised per session, so long-running chats stay
 within the model's context window.
 
+Session commands
+----------------
+
+A run is steered with in-session ``/commands``: type ``/`` in the input for
+the menu.  ``/mode`` sets the operating mode, and ``/help`` lists the
+available commands.  Commands run without the model -- a client command in
+the frontend, a graph command in the graph.  See :doc:`commands`.
+
+Project context
+---------------
+
+The agent reads a project instruction file from its working directory and
+loads it into session-scoped *discovery*: ``AGENTS.md`` is preferred, with
+``CLAUDE.md`` as the fallback (the first one present wins).  The file is
+read once per session and re-read only when its modification time changes,
+so editing it updates the agent without restarting the server.
+
+The discovered text is rendered into the **Planner** and the final
+**answer-composer** prompts, so project conventions (build and test
+commands, code layout, house style) inform both how a task is planned and
+how the reply is written.  It is not injected into the per-round nodes,
+which see project specifics through the plan instead.  A project with no
+instruction file simply has no extra context.
+
 Tool access
 -----------
 
 The agent defaults to the ``full`` tool access level, and the level can be
 changed per chat in the web UI's status pane.  Under ``read_only`` only
-tools annotated read-only are offered.  See :doc:`mcp-servers` for the
-access model and its sandboxing caveats; environment and coding requests
-are answerable in full mode through the bundled ``run_command`` tool.
+tools annotated read-only are offered, so file listing, reading and search
+(``read_file`` / ``grep`` / ``find_files``) stay available while destructive
+tools such as ``run_command`` and the file editors (``write_file`` /
+``edit_file``) do not.  See :doc:`mcp-servers` for the access model and its
+sandboxing caveats; environment and coding requests are answerable in full
+mode through the bundled ``run_command``, ``write_file`` and ``edit_file``
+tools.
 
 Status
 ------
@@ -78,11 +115,11 @@ The agent is unreleased.  Notably still in progress:
 
 * the Scientific mode knowledge source (retrieval, ADR-0029);
 * grounding/assurance enforcement -- answers are labelled ``unverified``
-  until this lands;
-* interactive human plan review (currently auto-approving).
+  until this lands.
 
 .. seealso::
 
    * :doc:`mcp-servers` -- the tools the agent can call
+   * :doc:`tools` -- the bundled tools it can call
    * :doc:`web-ui` -- the interface, including the mode and access selectors
    * :doc:`../cli/klea` -- the agent CLI reference

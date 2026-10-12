@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../../../../genindex.html"><link rel="search" title="Search" href="../../../../../../search.html">
         <link rel="prefetch" href="../../../../../../_static/klea-logo.png" as="image">
 
-    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
+    <link rel="shortcut icon" href="../../../../../../_static/klea-logo-notext.png"><!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
         <title>klea_utils.ui.web.nicegui.components.context - Klea</title>
       <link rel="stylesheet" type="text/css" href="../../../../../../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../../../../../../_static/styles/furo.css?v=7bdb33bb" />
@@ -187,7 +187,6 @@
     <img class="sidebar-logo" src="../../../../../../_static/klea-logo.png" alt="Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">Klea</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../../../../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -206,6 +205,8 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../../../../../components/index.html">Components</a><input aria-label="Toggle navigation of Components" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../../components/rag.html">Klea RAG</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../../components/mcp-servers.html">MCP servers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../components/tools.html">Tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../components/commands.html">Session commands</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../../components/web-ui.html">Web interface</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../../components/agent.html">Klea Agent</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../../components/utils.html">Klea Utils</a></li>
@@ -247,12 +248,13 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../../../../api/utils/api.html">API</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../../api/utils/ui.html">UI</a><input aria-label="Toggle navigation of UI" class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" role="switch" type="checkbox"/><label for="toctree-checkbox-8"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../../api/utils/ui-nicegui.html">UI — NiceGUI</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../../../api/utils/ui-tui.html">UI — TUI / REPL</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../../api/utils/ui-tui.html">UI - terminal REPL</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../../api/utils/ui-cli.html">UI — client CLI</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../../api/utils/ui-stores-create.html">UI — store creation CLI</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../../api/utils/nodes.html">Nodes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../../../api/utils/imports.html">Optional-dependency imports</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../../api/utils/paths.html">Path utilities</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../../api/utils/plogging.html">Logging</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../../api/utils/errors.html">Error types</a></li>
@@ -331,8 +333,17 @@
 <span class="w">    </span><span class="sd">"""No-op default for callbacks that are not yet/never registered."""</span>
 
 
+<span class="k">def</span><span class="w"> </span><span class="nf">_noop_str</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""No-op default returning an empty string (no active chat)."""</span>
+    <span class="k">return</span> <span class="s2">""</span>
+
+
 <span class="k">def</span><span class="w"> </span><span class="nf">_noop_arg</span><span class="p">(</span><span class="n">_</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""No-op default for one-argument callbacks (e.g. chat switching)."""</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_noop_args</span><span class="p">(</span><span class="o">*</span><span class="n">_args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">_kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""No-op default for callbacks that take arguments."""</span>
 
 
 <div class="viewcode-block" id="PageContext">
@@ -347,11 +358,25 @@
 <span class="sd">    page assembly creates one context, attaches all components, then</span>
 <span class="sd">    lets handlers resolve references at event time.</span>
 
+<span class="sd">    .. warning::</span>
+<span class="sd">       **Do not create NiceGUI elements from a</span>
+<span class="sd">       ``nicegui.background_tasks`` task.**  NiceGUI resolves a new</span>
+<span class="sd">       element's parent from a per-task slot stack; a background task has</span>
+<span class="sd">       an empty stack and raises "The current slot cannot be determined</span>
+<span class="sd">       because the slot stack for this task is empty".  Either wire the</span>
+<span class="sd">       work as an ``async`` event handler (NiceGUI awaits it in the</span>
+<span class="sd">       client/slot context, so ``ui.dialog()`` etc. work), or enter a</span>
+<span class="sd">       slot explicitly before creating elements, e.g. ``with</span>
+<span class="sd">       ctx.turn_status_container:`` (the turn status region) or ``with</span>
+<span class="sd">       ctx.dialog_container:`` (dialogs opened from a background task).</span>
+<span class="sd">       Updating existing elements and ``app.storage`` from a background</span>
+<span class="sd">       task is fine.</span>
+
 <span class="sd">    :param server_url: Base URL of the backend API server.</span>
 <span class="sd">    :param user_id: Opaque persistent user identifier.</span>
 <span class="sd">    :param title: Bold application title in the header bar.</span>
 <span class="sd">    :param subtitle: Optional smaller text shown next to *title*.</span>
-<span class="sd">    :param disclaimer: Optional text shown below the chat input.</span>
+<span class="sd">    :param disclaimer: Optional text shown in the footer.</span>
 <span class="sd">    :param footer_text: HTML content for the footer bar.</span>
 <span class="sd">    :param chat_id: Active chat conversation identifier.</span>
 <span class="sd">    """</span>
@@ -365,14 +390,23 @@
     <span class="n">chat_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span>
 
     <span class="c1"># Mutable runtime state</span>
-    <span class="n">expanded</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">set</span><span class="p">)</span>
-    <span class="n">is_streaming</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="c1">#: Per-chat run registry, keyed by ``"{user_id}:{chat_id}"``: the asyncio</span>
+    <span class="c1">#: task driving each chat's run and its Retry callback.  Page-scoped (the</span>
+    <span class="c1">#: tasks are bound to this page's event loop) and independent of the</span>
+    <span class="c1">#: process-global ``chats`` store, so several chats can run at once.</span>
+    <span class="n">stream_tasks</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+    <span class="n">retry_cbs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
     <span class="n">mini_state</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
 
     <span class="c1"># Extra request fields merged into the ``/query/stream`` POST body</span>
     <span class="c1"># (e.g. an app-specific operating ``mode`` request, ADR-0030).  The</span>
     <span class="c1"># app UI writes it; the shared stream driver forwards it.</span>
     <span class="n">query_extra</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+
+    <span class="c1">#: Merged command catalogue (the frontend's client commands plus the</span>
+    <span class="c1">#: server catalogue fetched from ``GET /commands``); ``None`` until the</span>
+    <span class="c1">#: initial load fetches it (ADR-0047).</span>
+    <span class="n">command_catalogue</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="c1"># Element references (filled by components at attach time)</span>
     <span class="n">dark</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span>
@@ -381,9 +415,19 @@
     <span class="n">center_panels</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">chat_area</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">scroll_area</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">stream_container</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">turn_status_container</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="c1">#: Live progress label inside the turn status region, updated in place during</span>
+    <span class="c1">#: a run (the region itself is re-rendered from per-chat state).</span>
+    <span class="n">turn_status_label</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">text</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">loading_row</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="c1">#: Stable inspector pane content column / scroll area (incremental append).</span>
+    <span class="n">inspector_container</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">inspector_scroll</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="c1">#: Hidden container used as an explicit slot when building dialogs from</span>
+    <span class="c1">#: a context that has no ambient slot (e.g. the first-run prompt runs in</span>
+    <span class="c1">#: a background task).  See the slot warning in the class docstring.</span>
+    <span class="n">dialog_container</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="c1"># Cross-component callbacks (registered by components at attach time</span>
     <span class="c1"># and invoked by handlers after the page is fully assembled)</span>
@@ -392,13 +436,67 @@
     <span class="n">refresh_chat_list</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">_noop</span><span class="p">)</span>
     <span class="n">refresh_status_pane</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">_noop</span><span class="p">)</span>
     <span class="n">refresh_inspector</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">_noop</span><span class="p">)</span>
+    <span class="c1">#: Incremental inspector updates: open a new query section (chat_id,</span>
+    <span class="c1">#: marker) and append one entry (chat_id, entry) without a full rebuild.</span>
+    <span class="n">begin_inspector_section</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">_noop_args</span><span class="p">)</span>
+    <span class="n">append_inspector</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">_noop_args</span><span class="p">)</span>
     <span class="n">reset_center_tab</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">_noop</span><span class="p">)</span>
+    <span class="n">refresh_send_state</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">_noop</span><span class="p">)</span>
+    <span class="c1">#: Re-render the turn status region from the active chat's turn status.</span>
+    <span class="c1">#: Registered by the chat-area component; the stream</span>
+    <span class="c1">#: component calls it on each status transition.</span>
+    <span class="n">refresh_turn_status</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">_noop</span><span class="p">)</span>
+    <span class="c1">#: Flip the send control between Send and Stop based on the current chat's</span>
+    <span class="c1">#: run state (registered by the input area; called by the stream component).</span>
+    <span class="n">refresh_stream_button</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">_noop</span><span class="p">)</span>
+    <span class="c1">#: Submit a HITL interrupt answer/cancel from the status-region form</span>
+    <span class="c1">#: (``response``, ``interrupt_id``, ``cancel``); registered by the input</span>
+    <span class="c1">#: area, called by the chat area's form (ADR-0046).</span>
+    <span class="n">submit_interrupt</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">_noop_args</span><span class="p">)</span>
     <span class="n">fetch_model_info</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">fetch_session_model_info</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">fetch_credentials</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">model_config_dialog</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="c1"># Cached per-session default model config (``fetch_session_models``) and</span>
+    <span class="c1"># the user's masked provider credentials (``fetch_credentials``), used</span>
+    <span class="c1"># when no chat is active and by the model dialog.</span>
+    <span class="n">session_model_info</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+    <span class="n">credentials</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
     <span class="c1"># App-defined content rendered inside the (refreshable) status pane,</span>
-    <span class="c1"># e.g. an operating-mode selector/badge (ADR-0030).</span>
-    <span class="n">status_extra</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">switch_chat</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">_noop_arg</span><span class="p">)</span></div>
+    <span class="c1"># e.g. operating-mode or tool-access selectors (ADR-0030,</span>
+    <span class="c1"># ADR-0037).  Each app UI appends its own render callable; the status</span>
+    <span class="c1"># pane calls them in registration order.</span>
+    <span class="n">status_extras</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[],</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="c1">#: Hooks invoked with a chat's data dict when it is first created, so an</span>
+    <span class="c1">#: app context control can carry a selection made before the first message</span>
+    <span class="c1">#: (e.g. operating mode / access level in ``query_extra``) onto that chat.</span>
+    <span class="n">chat_created_hooks</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="kc">None</span><span class="p">]]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">switch_chat</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">_noop_arg</span><span class="p">)</span>
+    <span class="c1">#: Hooks invoked with a chat's data dict whenever a graph ``context`` event</span>
+    <span class="c1">#: updates its session context, so a context control (operating mode /</span>
+    <span class="c1">#: tool access) can reconcile its per-chat preference with the checkpointed</span>
+    <span class="c1">#: value the server just reported (e.g. after a ``/mode`` command).</span>
+    <span class="n">context_hooks</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="kc">None</span><span class="p">]]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="c1">#: Return the active chat id, creating and registering one (server-side</span>
+    <span class="c1">#: creation, chat-list refresh, created-hooks) when none is active.</span>
+    <span class="c1">#: Registered by the input area; lets client-command output (e.g. ``/help``)</span>
+    <span class="c1">#: land in a chat even when the first input is a command (ADR-0047).</span>
+    <span class="n">ensure_active_chat</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">_noop_str</span><span class="p">)</span>
+
+<div class="viewcode-block" id="PageContext.chat_is_streaming">
+<a class="viewcode-back" href="../../../../../../api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.components.context.PageContext.chat_is_streaming">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">chat_is_streaming</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chat_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Return whether *chat_id* has an active run on this page.</span>
+
+<span class="sd">        Reads the per-chat registry (the ``chat_id`` is scoped by this page's</span>
+<span class="sd">        ``user_id``), not the display state in the ``chats`` store.</span>
+
+<span class="sd">        :param chat_id: Chat conversation identifier.</span>
+<span class="sd">        :returns: True when a live run is registered for the chat.</span>
+<span class="sd">        """</span>
+        <span class="n">task</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stream_tasks</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">user_id</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">chat_id</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">task</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">task</span><span class="o">.</span><span class="n">done</span><span class="p">()</span></div>
+</div>
 
 </pre></div>
         </article>

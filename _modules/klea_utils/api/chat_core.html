@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html"><link rel="search" title="Search" href="../../../search.html">
         <link rel="prefetch" href="../../../_static/klea-logo.png" as="image">
 
-    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
+    <link rel="shortcut icon" href="../../../_static/klea-logo-notext.png"><!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
         <title>klea_utils.api.chat_core - Klea</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=7bdb33bb" />
@@ -187,7 +187,6 @@
     <img class="sidebar-logo" src="../../../_static/klea-logo.png" alt="Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">Klea</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -206,6 +205,8 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../../components/index.html">Components</a><input aria-label="Toggle navigation of Components" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../components/rag.html">Klea RAG</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../components/mcp-servers.html">MCP servers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../components/tools.html">Tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../components/commands.html">Session commands</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../components/web-ui.html">Web interface</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../components/agent.html">Klea Agent</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../components/utils.html">Klea Utils</a></li>
@@ -247,12 +248,13 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../api/utils/api.html">API</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../api/utils/ui.html">UI</a><input aria-label="Toggle navigation of UI" class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" role="switch" type="checkbox"/><label for="toctree-checkbox-8"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/utils/ui-nicegui.html">UI — NiceGUI</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/utils/ui-tui.html">UI — TUI / REPL</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils/ui-tui.html">UI - terminal REPL</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/utils/ui-cli.html">UI — client CLI</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/utils/ui-stores-create.html">UI — store creation CLI</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/utils/nodes.html">Nodes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/utils/imports.html">Optional-dependency imports</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/utils/paths.html">Path utilities</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/utils/plogging.html">Logging</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/utils/errors.html">Error types</a></li>
@@ -302,14 +304,14 @@
           <h1>Source code for klea_utils.api.chat_core</h1><div class="highlight"><pre>
 <span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="sd">"""</span>
-<span class="sd">Shared chat endpoint plumbing for Klea packages.</span>
+<span class="sd">Shared chat endpoint runners.</span>
 
 <span class="sd">This module provides the *generic* plumbing the chat endpoints</span>
 <span class="sd">(``/query`` and ``/query/stream``) all need: readiness checks, session</span>
 <span class="sd">persistence, per-request model overrides, SSE framing, and error</span>
 <span class="sd">handling.  The API contract itself is app-specific -- each app's</span>
 <span class="sd">``api/chat.py`` defines its own ``ChatPayload`` model and its own</span>
-<span class="sd">endpoint functions, wired through the helpers here, so the router can</span>
+<span class="sd">endpoint functions, wired through the runners here, so the router can</span>
 <span class="sd">expose whichever fields the app contract needs (e.g. the agent's</span>
 <span class="sd">``mode``) without growing this shared module.</span>
 
@@ -317,53 +319,168 @@
 <span class="sd">stream (for example a ``context`` event carrying the agent operating</span>
 <span class="sd">mode), while the shared framing stays here.</span>
 
+<span class="sd">The ordered request/lifecycle view of this module is documented in</span>
+<span class="sd">``devdocs/system/api-sse-sequence.md``; the emitted event catalogue is</span>
+<span class="sd">``devdocs/system/streams.md``.  Keep both in sync when the contract changes.</span>
+
+<span class="sd">Supporting helpers live in focused modules:</span>
+<span class="sd">:mod:`klea_utils.api.chat_common` (app-state, thread identity, cancel),</span>
+<span class="sd">:mod:`klea_utils.api.overrides` (model overrides/credentials), and</span>
+<span class="sd">:mod:`klea_utils.api.hitl` (human-in-the-loop, ADR-0046).</span>
+
 <span class="sd">File: klea_utils/api/chat_core.py</span>
 
 <span class="sd">Copyright 2026 Ankur Sinha</span>
-<span class="sd">Author: Ankur Sinha &lt;sanjay DOT ankur AT gmail DOT com&gt;</span>
+<span class="sd">Author: Ankur Sinha &lt;sanjay DOT ankur AT gmail dot com&gt;</span>
 <span class="sd">"""</span>
 
+<span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">contextlib</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">traceback</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncIterator</span><span class="p">,</span> <span class="n">Callable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncGenerator</span><span class="p">,</span> <span class="n">AsyncIterator</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Mapping</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">fastapi</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTTPException</span><span class="p">,</span> <span class="n">Request</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">fastapi.responses</span><span class="w"> </span><span class="kn">import</span> <span class="n">StreamingResponse</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">klea_utils.api.chat_common</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">_active_runs</span><span class="p">,</span>
+    <span class="n">_ensure_thread_free</span><span class="p">,</span>
+    <span class="n">_graph_and_store</span><span class="p">,</span>
+    <span class="n">thread_id_for</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">klea_utils.api.hitl</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">_interrupt_event_question</span><span class="p">,</span>
+    <span class="n">_interrupt_question</span><span class="p">,</span>
+    <span class="n">_pending_interrupts</span><span class="p">,</span>
+    <span class="n">_prepare_chat_request</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">klea_utils.api.overrides</span><span class="w"> </span><span class="kn">import</span> <span class="n">resolve_model_overrides</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">klea_utils.api.sessions_db</span><span class="w"> </span><span class="kn">import</span> <span class="n">SessionStore</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">klea_utils.commands.common</span><span class="w"> </span><span class="kn">import</span> <span class="n">parse_command</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">klea_utils.plogging</span><span class="w"> </span><span class="kn">import</span> <span class="n">mask_sensitive</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_graph_and_store</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">SessionStore</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">"""Resolve the graph and session store from ``app.state``.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_command_persist_mode</span><span class="p">(</span><span class="n">graph</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Return a command query's persistence, or ``None`` when not a command.</span>
 
-<span class="sd">    Raises HTTP 503 when the server has not finished starting up or the</span>
-<span class="sd">    graph is missing (the lifespan built by</span>
-<span class="sd">    :func:`klea_utils.api.app.make_app` populates both).</span>
+<span class="sd">    Commands are ephemeral by default (their graph-state change is</span>
+<span class="sd">    checkpointed, but no chat rows are written); a command with</span>
+<span class="sd">    ``persists="message"`` is recorded like a normal turn.  A ``None`` result</span>
+<span class="sd">    means the query is not a command (or the app has no command framework, e.g.</span>
+<span class="sd">    RAG), so the caller persists normally.</span>
 
-<span class="sd">    :param request: The incoming request; ``request.app.state`` carries</span>
-<span class="sd">        ``is_ready``, ``graph`` and ``chat_sessions``.</span>
-<span class="sd">    :returns: ``(graph, SessionStore)``</span>
+<span class="sd">    :param graph: The app graph (carries ``command_registry`` when it uses the</span>
+<span class="sd">        session-command framework).</span>
+<span class="sd">    :param query: The user query, or ``None`` on a resume.</span>
+<span class="sd">    :returns: ``True`` (command that persists), ``False`` (ephemeral command),</span>
+<span class="sd">        or ``None`` (not a command).</span>
 <span class="sd">    """</span>
-    <span class="k">if</span> <span class="p">(</span>
-        <span class="ow">not</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="s2">"is_ready"</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
-        <span class="ow">or</span> <span class="ow">not</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="s2">"graph"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="ow">or</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">graph</span><span class="p">,</span> <span class="s2">"graph"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span>
-    <span class="p">):</span>
-        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">503</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="s2">"Service not ready"</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">request</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">graph</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">chat_sessions</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">query</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="n">parsed</span> <span class="o">=</span> <span class="n">parse_command</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">parsed</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="n">registry</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="s2">"command_registry"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">registry</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="n">command</span> <span class="o">=</span> <span class="n">registry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">parsed</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="k">if</span> <span class="n">parsed</span><span class="o">.</span><span class="n">name</span> <span class="k">else</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="n">command</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">command</span><span class="o">.</span><span class="n">persists</span> <span class="o">==</span> <span class="s2">"message"</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="thread_id_for">
-<a class="viewcode-back" href="../../../api/utils/api.html#klea_utils.api.chat_core.thread_id_for">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">thread_id_for</span><span class="p">(</span><span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">chat_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">"""Return the checkpoint thread id for a ``{user_id}:{chat_id}`` pair."""</span>
-    <span class="k">return</span> <span class="sa">f</span><span class="s2">"user_</span><span class="si">{</span><span class="n">user_id</span><span class="si">}</span><span class="s2">:chat_</span><span class="si">{</span><span class="n">chat_id</span><span class="si">}</span><span class="s2">"</span></div>
+<span class="c1">#: Idle gap, in seconds, after which :func:`_heartbeat` emits a ``ping`` SSE</span>
+<span class="c1">#: frame.  A long-running tool (e.g. ``run_command``) emits no graph events</span>
+<span class="c1">#: while it runs, so without a heartbeat the client's idle read timeout (300 s</span>
+<span class="c1">#: in ``sse.py``) and intermediary proxies drop the stream.  15 s is well below</span>
+<span class="c1">#: both.</span>
+<span class="n">HEARTBEAT_INTERVAL_SECONDS</span> <span class="o">=</span> <span class="mf">15.0</span>
 
+
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="c1"># SSE framing</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_error_frame</span><span class="p">(</span><span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">error_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">resumable</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Return one SSE ``error`` frame, with a ``resumable`` hint.</span>
+
+<span class="sd">    ``resumable`` tells the client it can retry the same run from the</span>
+<span class="sd">    checkpoint (see the graph fault-tolerance note); it is false when there</span>
+<span class="sd">    is nothing to resume.</span>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="s2">"data: "</span>
+        <span class="o">+</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"error"</span><span class="p">,</span>
+                <span class="s2">"message"</span><span class="p">:</span> <span class="n">message</span><span class="p">,</span>
+                <span class="s2">"error_type"</span><span class="p">:</span> <span class="n">error_type</span><span class="p">,</span>
+                <span class="s2">"node"</span><span class="p">:</span> <span class="s2">""</span><span class="p">,</span>
+                <span class="s2">"resumable"</span><span class="p">:</span> <span class="n">resumable</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+        <span class="o">+</span> <span class="s2">"</span><span class="se">\n\n</span><span class="s2">"</span>
+    <span class="p">)</span>
+
+
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_heartbeat</span><span class="p">(</span>
+    <span class="n">events</span><span class="p">:</span> <span class="n">AsyncIterator</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span> <span class="n">interval</span><span class="p">:</span> <span class="nb">float</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AsyncGenerator</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Yield *events*, interleaving ``ping`` frames during idle gaps.</span>
+
+<span class="sd">    The graph emits nothing while a long-running node (e.g. a tool) is</span>
+<span class="sd">    executing, so the client's idle read timeout would drop the stream.  This</span>
+<span class="sd">    wrapper keeps the connection warm: it reads the next graph event in a</span>
+<span class="sd">    separate task and, when none arrives within *interval* seconds, yields a</span>
+<span class="sd">    ``{"type": "ping"}`` frame before waiting again.</span>
+
+<span class="sd">    The in-flight ``__anext__`` task is preserved across timeouts and never</span>
+<span class="sd">    cancelled by the heartbeat itself (so the running node/tool is not</span>
+<span class="sd">    interrupted); ``asyncio.wait`` is used rather than ``asyncio.wait_for``/</span>
+<span class="sd">    ``asyncio.timeout``, which would cancel it.  On early close (client</span>
+<span class="sd">    disconnect or Stop) the pending read is cancelled and the source generator</span>
+<span class="sd">    is closed, so cancellation still propagates into the graph.</span>
+
+<span class="sd">    :param events: The graph's (or ``enrich``-wrapped) event async iterator.</span>
+<span class="sd">    :param interval: Seconds of inactivity before a ``ping`` is emitted.</span>
+<span class="sd">    :yields: The source events, plus periodic ``ping`` events.</span>
+<span class="sd">    """</span>
+    <span class="nb">aiter</span> <span class="o">=</span> <span class="n">events</span><span class="o">.</span><span class="fm">__aiter__</span><span class="p">()</span>
+    <span class="n">pending</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">ensure_future</span><span class="p">(</span><span class="nb">aiter</span><span class="o">.</span><span class="fm">__anext__</span><span class="p">())</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">done</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">wait</span><span class="p">({</span><span class="n">pending</span><span class="p">},</span> <span class="n">timeout</span><span class="o">=</span><span class="n">interval</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">done</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                    <span class="s2">"SSE heartbeat: no event for </span><span class="si">%.1f</span><span class="s2">s, emitting ping"</span><span class="p">,</span> <span class="n">interval</span>
+                <span class="p">)</span>
+                <span class="k">yield</span> <span class="p">{</span><span class="s2">"type"</span><span class="p">:</span> <span class="s2">"ping"</span><span class="p">}</span>
+                <span class="k">continue</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">event</span> <span class="o">=</span> <span class="n">pending</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">StopAsyncIteration</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="k">yield</span> <span class="n">event</span>
+            <span class="n">pending</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">ensure_future</span><span class="p">(</span><span class="nb">aiter</span><span class="o">.</span><span class="fm">__anext__</span><span class="p">())</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">pending</span><span class="o">.</span><span class="n">done</span><span class="p">():</span>
+            <span class="n">pending</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
+        <span class="k">with</span> <span class="n">contextlib</span><span class="o">.</span><span class="n">suppress</span><span class="p">(</span><span class="n">asyncio</span><span class="o">.</span><span class="n">CancelledError</span><span class="p">,</span> <span class="ne">StopAsyncIteration</span><span class="p">):</span>
+            <span class="k">await</span> <span class="n">pending</span>
+        <span class="n">aclose</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="nb">aiter</span><span class="p">,</span> <span class="s2">"aclose"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">aclose</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Best-effort: never let a failing close mask the real outcome.</span>
+            <span class="k">with</span> <span class="n">contextlib</span><span class="o">.</span><span class="n">suppress</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+                <span class="k">await</span> <span class="n">aclose</span><span class="p">()</span>
+
+
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="c1"># Endpoint runners</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
 
 
 <div class="viewcode-block" id="run_query">
@@ -371,9 +488,13 @@
 <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">run_query</span><span class="p">(</span>
     <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
-    <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">query</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">chat_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">resume</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">interrupt_response</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">interrupt_cancel</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">interrupt_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">extra_state</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">context_fields</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
@@ -381,16 +502,26 @@
 
 <span class="sd">    Applies the stored per-chat model overrides for the duration of the</span>
 <span class="sd">    call (via the LangGraph Runtime context, ADR-0033), maps graph errors</span>
-<span class="sd">    onto HTTP status codes, and writes the user query + assistant answer</span>
-<span class="sd">    to the session store.</span>
+<span class="sd">    onto HTTP status codes, and writes the user turn when the run starts and</span>
+<span class="sd">    the assistant reply on success (so a failed turn is recorded and a</span>
+<span class="sd">    resume completes it without duplication).</span>
 
 <span class="sd">    :param request: Request carrying ``app.state.graph`` / ``chat_sessions``</span>
-<span class="sd">    :param query: User query text</span>
+<span class="sd">    :param query: User query text; required unless *resume* is true, and</span>
+<span class="sd">        must be empty when *resume* is true</span>
 <span class="sd">    :param user_id: Persistent user identifier</span>
 <span class="sd">    :param chat_id: Chat conversation identifier</span>
+<span class="sd">    :param resume: Resume the thread's last failed run from its checkpoint</span>
+<span class="sd">        (invoked with ``None``; no user turn is written)</span>
+<span class="sd">    :param interrupt_response: Answer a pending HITL interrupt (ADR-0046); the</span>
+<span class="sd">        mapping is passed as ``Command(resume=...)`` and recorded as the user</span>
+<span class="sd">        turn.</span>
+<span class="sd">    :param interrupt_cancel: Cancel a pending HITL interrupt (a terminal run).</span>
+<span class="sd">    :param interrupt_id: Optional id of the interrupt being answered; a</span>
+<span class="sd">        mismatch with the pending interrupt is rejected as stale.</span>
 <span class="sd">    :param extra_state: Optional app-specific initial state fields passed</span>
 <span class="sd">        to the graph invocation (e.g. the agent's operating ``mode``</span>
-<span class="sd">        request).</span>
+<span class="sd">        request).  Ignored on resume.</span>
 <span class="sd">    :param context_fields: Optional app-defined per-run context fields that</span>
 <span class="sd">        the plumbing forwards together with the framework-provided</span>
 <span class="sd">        ``model_overrides`` slice (ADR-0033).  The assembled dict is</span>
@@ -406,10 +537,13 @@
 <span class="sd">        not produced on the bare ``ainvoke`` path (``run_graph_invoke``)</span>
 <span class="sd">        -- fetch it via ``/query/stream`` ``context`` events or the</span>
 <span class="sd">        hydration endpoint ``GET /chat/{user_id}/{chat_id}/context``.</span>
-<span class="sd">    :raises HTTPException: 400 on ``ValueError``, 503 on ``RuntimeError``,</span>
-<span class="sd">        500 on any other failure</span>
+<span class="sd">    :raises HTTPException: 400 on a missing/extra query, an empty resume,</span>
+<span class="sd">        or ``ValueError``; 503 on ``RuntimeError``; 500 on any other failure</span>
 <span class="sd">    """</span>
-    <span class="c1"># Lazy: BaseLangGraph is the base class for all graphs.</span>
+    <span class="c1"># Lazy: BaseLangGraph is the base class for all graphs; EmptyInputError is</span>
+    <span class="c1"># only needed when a resume finds nothing to continue.</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">langgraph.errors</span><span class="w"> </span><span class="kn">import</span> <span class="n">EmptyInputError</span>
+
     <span class="kn">from</span><span class="w"> </span><span class="nn">klea_utils.graph.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseLangGraph</span>
 
     <span class="n">graph</span><span class="p">:</span> <span class="n">BaseLangGraph</span>
@@ -417,14 +551,33 @@
     <span class="n">graph</span><span class="p">,</span> <span class="n">store</span> <span class="o">=</span> <span class="n">_graph_and_store</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
     <span class="n">thread_id</span> <span class="o">=</span> <span class="n">thread_id_for</span><span class="p">(</span><span class="n">user_id</span><span class="p">,</span> <span class="n">chat_id</span><span class="p">)</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-        <span class="s2">"run_query(user_id=</span><span class="si">%s</span><span class="s2"> chat_id=</span><span class="si">%s</span><span class="s2">) thread=</span><span class="si">%s</span><span class="s2"> context_fields=</span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span>
+        <span class="s2">"run_query(user_id=</span><span class="si">%s</span><span class="s2"> chat_id=</span><span class="si">%s</span><span class="s2">) thread=</span><span class="si">%s</span><span class="s2"> resume=</span><span class="si">%s</span><span class="s2"> context_fields=</span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span>
         <span class="n">user_id</span><span class="p">,</span>
         <span class="n">chat_id</span><span class="p">,</span>
         <span class="n">thread_id</span><span class="p">,</span>
+        <span class="n">resume</span><span class="p">,</span>
         <span class="nb">list</span><span class="p">((</span><span class="n">context_fields</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span>
     <span class="p">)</span>
 
+    <span class="n">_action</span><span class="p">,</span> <span class="n">graph_input</span><span class="p">,</span> <span class="n">user_turn</span> <span class="o">=</span> <span class="k">await</span> <span class="n">_prepare_chat_request</span><span class="p">(</span>
+        <span class="n">graph</span><span class="p">,</span>
+        <span class="n">thread_id</span><span class="o">=</span><span class="n">thread_id</span><span class="p">,</span>
+        <span class="n">query</span><span class="o">=</span><span class="n">query</span><span class="p">,</span>
+        <span class="n">resume</span><span class="o">=</span><span class="n">resume</span><span class="p">,</span>
+        <span class="n">interrupt_response</span><span class="o">=</span><span class="n">interrupt_response</span><span class="p">,</span>
+        <span class="n">interrupt_cancel</span><span class="o">=</span><span class="n">interrupt_cancel</span><span class="p">,</span>
+        <span class="n">interrupt_id</span><span class="o">=</span><span class="n">interrupt_id</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># A command turn is ephemeral by default (ADR-0047): its state change is</span>
+    <span class="c1"># checkpointed, but no chat rows are written.</span>
+    <span class="n">ephemeral_command</span> <span class="o">=</span> <span class="n">_command_persist_mode</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">query</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span>
     <span class="n">store</span><span class="o">.</span><span class="n">create_chat</span><span class="p">(</span><span class="n">user_id</span><span class="p">,</span> <span class="n">chat_id</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">user_turn</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">ephemeral_command</span><span class="p">:</span>
+        <span class="c1"># Record the user turn when the run starts (not only on success), so</span>
+        <span class="c1"># a turn that fails mid-run is still visible and retryable.</span>
+        <span class="n">store</span><span class="o">.</span><span class="n">add_message</span><span class="p">(</span><span class="n">user_id</span><span class="p">,</span> <span class="n">chat_id</span><span class="p">,</span> <span class="s2">"user"</span><span class="p">,</span> <span class="n">user_turn</span><span class="p">)</span>
+
     <span class="c1"># Per-run runtime context (ADR-0033): the framework provides the stored</span>
     <span class="c1"># per-chat ``model_overrides`` slice; apps may add their own fields via</span>
     <span class="c1"># ``context_fields``.  The plain dict is coerced/validated against the</span>
@@ -432,25 +585,57 @@
     <span class="c1"># *instance* here would skip that coercion, so chat_core stays</span>
     <span class="c1"># agnostic -- apps that diverge override the node layer, not the</span>
     <span class="c1"># runner).</span>
-    <span class="n">overrides</span> <span class="o">=</span> <span class="n">store</span><span class="o">.</span><span class="n">get_overrides</span><span class="p">(</span><span class="n">user_id</span><span class="p">,</span> <span class="n">chat_id</span><span class="p">)</span>
+    <span class="n">overrides</span> <span class="o">=</span> <span class="n">resolve_model_overrides</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">store</span><span class="p">,</span> <span class="n">user_id</span><span class="p">,</span> <span class="n">chat_id</span><span class="p">)</span>
     <span class="n">context</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
         <span class="o">**</span><span class="p">(</span><span class="n">context_fields</span> <span class="ow">or</span> <span class="p">{}),</span>
         <span class="s2">"model_overrides"</span><span class="p">:</span> <span class="n">overrides</span> <span class="ow">or</span> <span class="p">{},</span>
     <span class="p">}</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"run_query: assembled runtime context=</span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="n">mask_sensitive</span><span class="p">(</span><span class="n">context</span><span class="p">))</span>
+
+    <span class="c1"># Single-flight per thread: reject a second run while one is in flight,</span>
+    <span class="c1"># then register this task so a concurrent cancel can reach it.  Cleared</span>
+    <span class="c1"># once the run returns (or raises), so the thread is reusable.</span>
+    <span class="n">registry</span> <span class="o">=</span> <span class="n">_active_runs</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+    <span class="n">_ensure_thread_free</span><span class="p">(</span><span class="n">registry</span><span class="p">,</span> <span class="n">thread_id</span><span class="p">)</span>
+    <span class="n">task</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">current_task</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">task</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">registry</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">thread_id</span><span class="p">,</span> <span class="n">task</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">graph</span><span class="o">.</span><span class="n">run_graph_invoke</span><span class="p">(</span>
-            <span class="n">query</span><span class="p">,</span> <span class="n">thread_id</span><span class="p">,</span> <span class="n">extra_state</span><span class="o">=</span><span class="n">extra_state</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">context</span>
+            <span class="n">graph_input</span><span class="p">,</span>
+            <span class="n">thread_id</span><span class="p">,</span>
+            <span class="n">extra_state</span><span class="o">=</span><span class="n">extra_state</span><span class="p">,</span>
+            <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">,</span>
         <span class="p">)</span>
+        <span class="n">pending</span> <span class="o">=</span> <span class="k">await</span> <span class="n">_pending_interrupts</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">thread_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">pending</span><span class="p">:</span>
+            <span class="c1"># The run paused for human input: persist the question and return</span>
+            <span class="c1"># it (there is no final answer yet).</span>
+            <span class="n">question</span> <span class="o">=</span> <span class="n">_interrupt_question</span><span class="p">(</span><span class="n">pending</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">ephemeral_command</span><span class="p">:</span>
+                <span class="n">store</span><span class="o">.</span><span class="n">add_message</span><span class="p">(</span><span class="n">user_id</span><span class="p">,</span> <span class="n">chat_id</span><span class="p">,</span> <span class="s2">"assistant"</span><span class="p">,</span> <span class="n">question</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="s2">"run_query(user_id=</span><span class="si">%s</span><span class="s2"> chat_id=</span><span class="si">%s</span><span class="s2">): paused for input"</span><span class="p">,</span>
+                <span class="n">user_id</span><span class="p">,</span>
+                <span class="n">chat_id</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">question</span>
         <span class="n">message</span> <span class="o">=</span> <span class="n">result</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
-        <span class="n">store</span><span class="o">.</span><span class="n">add_message</span><span class="p">(</span><span class="n">user_id</span><span class="p">,</span> <span class="n">chat_id</span><span class="p">,</span> <span class="s2">"user"</span><span class="p">,</span> <span class="n">query</span><span class="p">)</span>
-        <span class="n">store</span><span class="o">.</span><span class="n">add_message</span><span class="p">(</span><span class="n">user_id</span><span class="p">,</span> <span class="n">chat_id</span><span class="p">,</span> <span class="s2">"assistant"</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ephemeral_command</span><span class="p">:</span>
+            <span class="n">store</span><span class="o">.</span><span class="n">add_message</span><span class="p">(</span><span class="n">user_id</span><span class="p">,</span> <span class="n">chat_id</span><span class="p">,</span> <span class="s2">"assistant"</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
             <span class="s2">"run_query(user_id=</span><span class="si">%s</span><span class="s2"> chat_id=</span><span class="si">%s</span><span class="s2">): answer </span><span class="si">%d</span><span class="s2"> chars"</span><span class="p">,</span>
             <span class="n">user_id</span><span class="p">,</span>
             <span class="n">chat_id</span><span class="p">,</span>
             <span class="nb">len</span><span class="p">(</span><span class="n">message</span><span class="p">),</span>
         <span class="p">)</span>
+    <span class="k">except</span> <span class="n">EmptyInputError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s2">"run_query: resume requested but nothing to resume for thread=</span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span>
+            <span class="n">thread_id</span><span class="p">,</span>
+            <span class="n">e</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="s2">"Nothing to resume for this chat."</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Bad request: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
@@ -460,6 +645,8 @@
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># noqa: BLE001</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">registry</span><span class="o">.</span><span class="n">clear</span><span class="p">(</span><span class="n">thread_id</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">message</span></div>
 
@@ -467,12 +654,16 @@
 
 <div class="viewcode-block" id="stream_response">
 <a class="viewcode-back" href="../../../api/utils/api.html#klea_utils.api.chat_core.stream_response">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">stream_response</span><span class="p">(</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">stream_response</span><span class="p">(</span>
     <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
-    <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">query</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">chat_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">resume</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">interrupt_response</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">interrupt_cancel</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">interrupt_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">enrich</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">AsyncIterator</span><span class="p">[</span><span class="nb">dict</span><span class="p">]],</span> <span class="n">AsyncIterator</span><span class="p">[</span><span class="nb">dict</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">extra_state</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">context_fields</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -480,14 +671,25 @@
 <span class="w">    </span><span class="sd">"""Return a ``/query/stream`` SSE response for the graph's events.</span>
 
 <span class="sd">    Applies the stored per-chat model overrides for the duration of the</span>
-<span class="sd">    stream, persists the user query + final assistant answer on the</span>
-<span class="sd">    ``complete`` event, and converts graph failures into ``error`` SSE</span>
-<span class="sd">    events instead of dropping the stream.</span>
+<span class="sd">    stream and writes the user turn when the run starts and the assistant</span>
+<span class="sd">    reply on the ``complete`` event, so a turn that fails mid-run is still</span>
+<span class="sd">    recorded and can be retried.  Graph failures become ``error`` SSE events</span>
+<span class="sd">    (with a ``resumable`` hint) instead of dropping the stream.</span>
 
 <span class="sd">    :param request: Request carrying ``app.state.graph`` / ``chat_sessions``</span>
-<span class="sd">    :param query: User query text</span>
+<span class="sd">    :param query: User query text; required unless *resume* is true, and</span>
+<span class="sd">        must be empty when *resume* is true</span>
 <span class="sd">    :param user_id: Persistent user identifier</span>
 <span class="sd">    :param chat_id: Chat conversation identifier</span>
+<span class="sd">    :param resume: Resume the thread's last failed run from its checkpoint.</span>
+<span class="sd">        The graph is invoked with ``None`` (no query) and the failed node is</span>
+<span class="sd">        re-run; no user turn is written.</span>
+<span class="sd">    :param interrupt_response: Answer a pending HITL interrupt (ADR-0046); the</span>
+<span class="sd">        mapping is passed as ``Command(resume=...)`` and recorded as the user</span>
+<span class="sd">        turn.</span>
+<span class="sd">    :param interrupt_cancel: Cancel a pending HITL interrupt (a terminal run).</span>
+<span class="sd">    :param interrupt_id: Optional id of the interrupt being answered; a</span>
+<span class="sd">        mismatch with the pending interrupt is rejected as stale.</span>
 <span class="sd">    :param enrich: Optional async-generator wrapper applied to the raw</span>
 <span class="sd">        ``run_graph_astream_events`` event stream before framing.  Apps</span>
 <span class="sd">        use it to inject app-specific events (e.g. a ``context`` event</span>
@@ -495,7 +697,7 @@
 <span class="sd">        ``None``, every graph event is emitted unchanged.</span>
 <span class="sd">    :param extra_state: Optional app-specific initial state fields passed</span>
 <span class="sd">        to the graph invocation (e.g. the agent's operating ``mode``</span>
-<span class="sd">        request).</span>
+<span class="sd">        request).  Ignored on resume.</span>
 <span class="sd">    :param context_fields: Optional app-defined per-run context fields that</span>
 <span class="sd">        the plumbing forwards together with the framework-provided</span>
 <span class="sd">        ``model_overrides`` slice (ADR-0033).  The assembled dict is</span>
@@ -506,7 +708,10 @@
 <span class="sd">        ``chat_core``.</span>
 <span class="sd">    :returns: A :class:`fastapi.responses.StreamingResponse` SSE stream</span>
 <span class="sd">    """</span>
-    <span class="c1"># Lazy: BaseLangGraph is the base class for all graphs.</span>
+    <span class="c1"># Lazy: BaseLangGraph is the base class for all graphs; EmptyInputError is</span>
+    <span class="c1"># only needed when a resume finds nothing to continue.</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">langgraph.errors</span><span class="w"> </span><span class="kn">import</span> <span class="n">EmptyInputError</span>
+
     <span class="kn">from</span><span class="w"> </span><span class="nn">klea_utils.graph.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseLangGraph</span>
 
     <span class="n">graph</span><span class="p">:</span> <span class="n">BaseLangGraph</span>
@@ -514,18 +719,37 @@
     <span class="n">graph</span><span class="p">,</span> <span class="n">store</span> <span class="o">=</span> <span class="n">_graph_and_store</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
     <span class="n">thread_id</span> <span class="o">=</span> <span class="n">thread_id_for</span><span class="p">(</span><span class="n">user_id</span><span class="p">,</span> <span class="n">chat_id</span><span class="p">)</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-        <span class="s2">"stream_response(user_id=</span><span class="si">%s</span><span class="s2"> chat_id=</span><span class="si">%s</span><span class="s2">) thread=</span><span class="si">%s</span><span class="s2"> context_fields=</span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span>
+        <span class="s2">"stream_response(user_id=</span><span class="si">%s</span><span class="s2"> chat_id=</span><span class="si">%s</span><span class="s2">) thread=</span><span class="si">%s</span><span class="s2"> resume=</span><span class="si">%s</span><span class="s2"> context_fields=</span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span>
         <span class="n">user_id</span><span class="p">,</span>
         <span class="n">chat_id</span><span class="p">,</span>
         <span class="n">thread_id</span><span class="p">,</span>
+        <span class="n">resume</span><span class="p">,</span>
         <span class="nb">list</span><span class="p">((</span><span class="n">context_fields</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span>
     <span class="p">)</span>
 
+    <span class="n">_action</span><span class="p">,</span> <span class="n">graph_input</span><span class="p">,</span> <span class="n">user_turn</span> <span class="o">=</span> <span class="k">await</span> <span class="n">_prepare_chat_request</span><span class="p">(</span>
+        <span class="n">graph</span><span class="p">,</span>
+        <span class="n">thread_id</span><span class="o">=</span><span class="n">thread_id</span><span class="p">,</span>
+        <span class="n">query</span><span class="o">=</span><span class="n">query</span><span class="p">,</span>
+        <span class="n">resume</span><span class="o">=</span><span class="n">resume</span><span class="p">,</span>
+        <span class="n">interrupt_response</span><span class="o">=</span><span class="n">interrupt_response</span><span class="p">,</span>
+        <span class="n">interrupt_cancel</span><span class="o">=</span><span class="n">interrupt_cancel</span><span class="p">,</span>
+        <span class="n">interrupt_id</span><span class="o">=</span><span class="n">interrupt_id</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># A command turn is ephemeral by default (ADR-0047); see run_query.</span>
+    <span class="n">ephemeral_command</span> <span class="o">=</span> <span class="n">_command_persist_mode</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">query</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span>
     <span class="n">store</span><span class="o">.</span><span class="n">create_chat</span><span class="p">(</span><span class="n">user_id</span><span class="p">,</span> <span class="n">chat_id</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">user_turn</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">ephemeral_command</span><span class="p">:</span>
+        <span class="c1"># Record the user turn when the run starts (not on completion), so a</span>
+        <span class="c1"># turn that fails mid-run is still visible and retryable; the</span>
+        <span class="c1"># assistant row is written on ``complete``.</span>
+        <span class="n">store</span><span class="o">.</span><span class="n">add_message</span><span class="p">(</span><span class="n">user_id</span><span class="p">,</span> <span class="n">chat_id</span><span class="p">,</span> <span class="s2">"user"</span><span class="p">,</span> <span class="n">user_turn</span><span class="p">)</span>
+
     <span class="c1"># Per-run runtime context (ADR-0033): same assembly as run_query -- the</span>
     <span class="c1"># framework's ``model_overrides`` slice plus any app ``context_fields``,</span>
     <span class="c1"># forwarded as a plain dict for boundary coercion/validation.</span>
-    <span class="n">overrides</span> <span class="o">=</span> <span class="n">store</span><span class="o">.</span><span class="n">get_overrides</span><span class="p">(</span><span class="n">user_id</span><span class="p">,</span> <span class="n">chat_id</span><span class="p">)</span>
+    <span class="n">overrides</span> <span class="o">=</span> <span class="n">resolve_model_overrides</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">store</span><span class="p">,</span> <span class="n">user_id</span><span class="p">,</span> <span class="n">chat_id</span><span class="p">)</span>
     <span class="n">context</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
         <span class="o">**</span><span class="p">(</span><span class="n">context_fields</span> <span class="ow">or</span> <span class="p">{}),</span>
         <span class="s2">"model_overrides"</span><span class="p">:</span> <span class="n">overrides</span> <span class="ow">or</span> <span class="p">{},</span>
@@ -534,40 +758,85 @@
         <span class="s2">"stream_response: assembled runtime context=</span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="n">mask_sensitive</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
     <span class="p">)</span>
 
+    <span class="c1"># Single-flight per thread, checked before the response is returned so a</span>
+    <span class="c1"># concurrent request gets a clean 409 rather than a second graph run.  The</span>
+    <span class="c1"># task is registered inside ``event_stream`` (the generator runs in its</span>
+    <span class="c1"># own task, which is the handle a cancel must reach) and cleared in its</span>
+    <span class="c1"># ``finally``; ``register`` also adds a done-callback as a leak backstop.</span>
+    <span class="n">registry</span> <span class="o">=</span> <span class="n">_active_runs</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+    <span class="n">_ensure_thread_free</span><span class="p">(</span><span class="n">registry</span><span class="p">,</span> <span class="n">thread_id</span><span class="p">)</span>
+
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">event_stream</span><span class="p">():</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"stream_response: starting event stream for thread=</span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="n">thread_id</span><span class="p">)</span>
+        <span class="n">task</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">current_task</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">task</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">registry</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">thread_id</span><span class="p">,</span> <span class="n">task</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">raw_events</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">run_graph_astream_events</span><span class="p">(</span>
-                <span class="n">query</span><span class="p">,</span> <span class="n">thread_id</span><span class="p">,</span> <span class="n">extra_state</span><span class="o">=</span><span class="n">extra_state</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">context</span>
+                <span class="n">graph_input</span><span class="p">,</span>
+                <span class="n">thread_id</span><span class="p">,</span>
+                <span class="n">extra_state</span><span class="o">=</span><span class="n">extra_state</span><span class="p">,</span>
+                <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="n">events</span> <span class="o">=</span> <span class="n">raw_events</span> <span class="k">if</span> <span class="n">enrich</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">enrich</span><span class="p">(</span><span class="n">raw_events</span><span class="p">)</span>
-            <span class="k">async</span> <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">events</span><span class="p">:</span>
-                <span class="n">t</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"type"</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">t</span> <span class="o">==</span> <span class="s2">"complete"</span><span class="p">:</span>
-                    <span class="n">store</span><span class="o">.</span><span class="n">add_message</span><span class="p">(</span><span class="n">user_id</span><span class="p">,</span> <span class="n">chat_id</span><span class="p">,</span> <span class="s2">"user"</span><span class="p">,</span> <span class="n">query</span><span class="p">)</span>
-                    <span class="n">store</span><span class="o">.</span><span class="n">add_message</span><span class="p">(</span>
-                        <span class="n">user_id</span><span class="p">,</span>
-                        <span class="n">chat_id</span><span class="p">,</span>
-                        <span class="s2">"assistant"</span><span class="p">,</span>
-                        <span class="n">event</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"message_for_user"</span><span class="p">,</span> <span class="s2">""</span><span class="p">),</span>
-                    <span class="p">)</span>
-                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-                        <span class="s2">"stream_response(user_id=</span><span class="si">%s</span><span class="s2"> chat_id=</span><span class="si">%s</span><span class="s2">): complete"</span><span class="p">,</span>
-                        <span class="n">user_id</span><span class="p">,</span>
-                        <span class="n">chat_id</span><span class="p">,</span>
-                    <span class="p">)</span>
-                <span class="k">yield</span> <span class="sa">f</span><span class="s2">"data: </span><span class="si">{</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">event</span><span class="p">)</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">"</span>
+            <span class="c1"># Keep the SSE connection warm while a long-running node (e.g. a</span>
+            <span class="c1"># tool) emits nothing, so the client's idle read timeout does not</span>
+            <span class="c1"># drop the stream mid-task.</span>
+            <span class="n">events</span> <span class="o">=</span> <span class="n">_heartbeat</span><span class="p">(</span><span class="n">events</span><span class="p">,</span> <span class="n">HEARTBEAT_INTERVAL_SECONDS</span><span class="p">)</span>
+            <span class="c1"># ``aclosing`` guarantees the heartbeat wrapper (and the graph</span>
+            <span class="c1"># generator beneath it) is closed on every exit path, including the</span>
+            <span class="c1"># generator finalisation Starlette performs after a client</span>
+            <span class="c1"># disconnect.</span>
+            <span class="k">async</span> <span class="k">with</span> <span class="n">contextlib</span><span class="o">.</span><span class="n">aclosing</span><span class="p">(</span><span class="n">events</span><span class="p">)</span> <span class="k">as</span> <span class="n">stream_events</span><span class="p">:</span>
+                <span class="k">async</span> <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">stream_events</span><span class="p">:</span>
+                    <span class="n">t</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"type"</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">t</span> <span class="o">==</span> <span class="s2">"interrupt"</span><span class="p">:</span>
+                        <span class="c1"># The run paused for human input: persist the question</span>
+                        <span class="c1"># so a reloaded chat shows it (the answer is a later</span>
+                        <span class="c1"># user turn).</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="n">ephemeral_command</span><span class="p">:</span>
+                            <span class="n">store</span><span class="o">.</span><span class="n">add_message</span><span class="p">(</span>
+                                <span class="n">user_id</span><span class="p">,</span>
+                                <span class="n">chat_id</span><span class="p">,</span>
+                                <span class="s2">"assistant"</span><span class="p">,</span>
+                                <span class="n">_interrupt_event_question</span><span class="p">(</span><span class="n">event</span><span class="p">),</span>
+                            <span class="p">)</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                            <span class="s2">"stream_response(user_id=</span><span class="si">%s</span><span class="s2"> chat_id=</span><span class="si">%s</span><span class="s2">): paused for input"</span><span class="p">,</span>
+                            <span class="n">user_id</span><span class="p">,</span>
+                            <span class="n">chat_id</span><span class="p">,</span>
+                        <span class="p">)</span>
+                    <span class="k">elif</span> <span class="n">t</span> <span class="o">==</span> <span class="s2">"complete"</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="n">ephemeral_command</span><span class="p">:</span>
+                            <span class="n">store</span><span class="o">.</span><span class="n">add_message</span><span class="p">(</span>
+                                <span class="n">user_id</span><span class="p">,</span>
+                                <span class="n">chat_id</span><span class="p">,</span>
+                                <span class="s2">"assistant"</span><span class="p">,</span>
+                                <span class="n">event</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"message_for_user"</span><span class="p">,</span> <span class="s2">""</span><span class="p">),</span>
+                            <span class="p">)</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                            <span class="s2">"stream_response(user_id=</span><span class="si">%s</span><span class="s2"> chat_id=</span><span class="si">%s</span><span class="s2">): complete"</span><span class="p">,</span>
+                            <span class="n">user_id</span><span class="p">,</span>
+                            <span class="n">chat_id</span><span class="p">,</span>
+                        <span class="p">)</span>
+                    <span class="k">yield</span> <span class="sa">f</span><span class="s2">"data: </span><span class="si">{</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">event</span><span class="p">)</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">"</span>
+        <span class="k">except</span> <span class="n">EmptyInputError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">"stream_response: resume requested but nothing to resume for "</span>
+                <span class="s2">"thread=</span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span>
+                <span class="n">thread_id</span><span class="p">,</span>
+                <span class="n">e</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">yield</span> <span class="n">_error_frame</span><span class="p">(</span>
+                <span class="s2">"Nothing to resume for this chat."</span><span class="p">,</span>
+                <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+                <span class="n">resumable</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># noqa: BLE001</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-            <span class="n">error_event</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span>
-                <span class="p">{</span>
-                    <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"error"</span><span class="p">,</span>
-                    <span class="s2">"message"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">),</span>
-                    <span class="s2">"error_type"</span><span class="p">:</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
-                    <span class="s2">"node"</span><span class="p">:</span> <span class="s2">""</span><span class="p">,</span>
-                <span class="p">}</span>
-            <span class="p">)</span>
-            <span class="k">yield</span> <span class="sa">f</span><span class="s2">"data: </span><span class="si">{</span><span class="n">error_event</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">"</span>
+            <span class="k">yield</span> <span class="n">_error_frame</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">),</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">resumable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">registry</span><span class="o">.</span><span class="n">clear</span><span class="p">(</span><span class="n">thread_id</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">StreamingResponse</span><span class="p">(</span>
         <span class="n">event_stream</span><span class="p">(),</span>
