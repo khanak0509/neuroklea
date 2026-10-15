@@ -208,6 +208,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../../../../components/tools.html">Tools</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../../components/commands.html">Session commands</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../../components/web-ui.html">Web interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../components/tui.html">Terminal interface</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../../components/agent.html">Klea Agent</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../../components/utils.html">Klea Utils</a></li>
 </ul>
@@ -246,9 +247,10 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../../../../api/utils/mcp.html">MCP utilities</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../../api/utils/models_catalog.html">Model catalog</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../../api/utils/api.html">API</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../../../api/utils/commands.html">Commands</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../../api/utils/ui.html">UI</a><input aria-label="Toggle navigation of UI" class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" role="switch" type="checkbox"/><label for="toctree-checkbox-8"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../../api/utils/ui-nicegui.html">UI — NiceGUI</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../../../api/utils/ui-tui.html">UI - terminal REPL</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../../api/utils/ui-tui.html">UI - terminal client</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../../api/utils/ui-cli.html">UI — client CLI</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../../api/utils/ui-stores-create.html">UI — store creation CLI</a></li>
 </ul>
@@ -329,7 +331,7 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">nicegui</span><span class="w"> </span><span class="kn">import</span> <span class="n">app</span><span class="p">,</span> <span class="n">ui</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">klea_utils.ui.web.nicegui.components.storage</span><span class="w"> </span><span class="kn">import</span> <span class="n">resolve_user_id</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">klea_utils.ui.web.nicegui.components.storage</span><span class="w"> </span><span class="kn">import</span> <span class="n">resolve_page_user_id</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -407,6 +409,45 @@
         <span class="p">)</span>
 
 
+<div class="viewcode-block" id="resolve_initial_chat">
+<a class="viewcode-back" href="../../../../../../api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.components.bootstrap.resolve_initial_chat">[docs]</a>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">resolve_initial_chat</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">resume</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
+    <span class="n">continue_session</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">server_url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
+    <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Return the chat id the page should open on load.</span>
+
+<span class="sd">    ``--resume &lt;chat_id&gt;`` wins; else ``--continue`` opens the most recently</span>
+<span class="sd">    updated chat for the user (``GET /chat/{user_id}`` is ordered most-recent</span>
+<span class="sd">    first); else ``""`` so the frontend starts a new chat.</span>
+
+<span class="sd">    :param resume: The ``--resume`` chat id, or ``""``.</span>
+<span class="sd">    :param continue_session: Whether ``--continue`` was given.</span>
+<span class="sd">    :param server_url: Base URL of the backend API server.</span>
+<span class="sd">    :param user_id: The resolved user id.</span>
+<span class="sd">    :returns: The chat id to open, or ``""`` for a fresh chat.</span>
+<span class="sd">    """</span>
+    <span class="n">resume</span> <span class="o">=</span> <span class="p">(</span><span class="n">resume</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">resume</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">resume</span>
+    <span class="k">if</span> <span class="n">continue_session</span><span class="p">:</span>
+        <span class="c1"># Lazy: the server API client is only needed for --continue.</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">klea_utils.ui.client</span><span class="w"> </span><span class="kn">import</span> <span class="n">fetch_chats</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">chats</span> <span class="o">=</span> <span class="k">await</span> <span class="n">fetch_chats</span><span class="p">(</span><span class="n">server_url</span><span class="p">,</span> <span class="n">user_id</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - best-effort launch default</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"--continue: could not list chats: </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="n">exc</span><span class="p">)</span>
+            <span class="k">return</span> <span class="s2">""</span>
+        <span class="k">if</span> <span class="n">chats</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">chats</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"chat_id"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s2">""</span></div>
+
+
+
 <div class="viewcode-block" id="run_nicegui_server">
 <a class="viewcode-back" href="../../../../../../api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.components.bootstrap.run_nicegui_server">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">run_nicegui_server</span><span class="p">(</span>
@@ -422,6 +463,11 @@
     <span class="n">storage_secret</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"klea-nicegui-secret-change-me"</span><span class="p">,</span>
     <span class="n">app_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"klea-agent-web"</span><span class="p">,</span>
     <span class="n">favicon</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
+    <span class="n">identity_app_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"klea-agent"</span><span class="p">,</span>
+    <span class="n">resume</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
+    <span class="n">continue_session</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">open_browser</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""Start the NiceGUI web server with a Klea page.</span>
 
@@ -452,6 +498,15 @@
 <span class="sd">        log file name so each app keeps its own logs.</span>
 <span class="sd">    :param favicon: Browser-tab favicon (a file path, URL, raw SVG or a</span>
 <span class="sd">        single character).  Defaults to the bundled Klea icon.</span>
+<span class="sd">    :param user_id: Explicit ``--user-id`` override for the page identity.</span>
+<span class="sd">    :param identity_app_name: Canonical identity key (the server app, e.g.</span>
+<span class="sd">        ``"klea-agent"``) for the shared host-local identity file.</span>
+<span class="sd">    :param resume: Chat id to open on load (``--resume``), or ``""``.</span>
+<span class="sd">    :param continue_session: Open the most recently updated chat on load</span>
+<span class="sd">        (``--continue``).</span>
+<span class="sd">    :param open_browser: When ``True``, open the UI in the user's default</span>
+<span class="sd">        browser once the port is ready (NiceGUI's ``show``; uses the portable</span>
+<span class="sd">        ``webbrowser`` module).  Pass ``False`` for headless/remote use.</span>
 <span class="sd">    """</span>
     <span class="n">_configure_logging</span><span class="p">(</span><span class="n">app_name</span><span class="p">)</span>
     <span class="n">_configure_storage</span><span class="p">(</span><span class="n">app_name</span><span class="p">)</span>
@@ -469,16 +524,24 @@
 <span class="sd">        User identity is resolved before any ``await`` so</span>
 <span class="sd">        ``app.storage.user`` is still in the request context.</span>
 <span class="sd">        """</span>
-        <span class="n">user_id</span> <span class="o">=</span> <span class="k">await</span> <span class="n">resolve_user_id</span><span class="p">()</span>
+        <span class="n">resolved_user_id</span> <span class="o">=</span> <span class="k">await</span> <span class="n">resolve_page_user_id</span><span class="p">(</span>
+            <span class="n">explicit</span><span class="o">=</span><span class="n">user_id</span><span class="p">,</span>
+            <span class="n">server_url</span><span class="o">=</span><span class="n">server_url</span><span class="p">,</span>
+            <span class="n">identity_app_name</span><span class="o">=</span><span class="n">identity_app_name</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">chat_id</span> <span class="o">=</span> <span class="k">await</span> <span class="n">resolve_initial_chat</span><span class="p">(</span>
+            <span class="n">resume</span><span class="o">=</span><span class="n">resume</span><span class="p">,</span>
+            <span class="n">continue_session</span><span class="o">=</span><span class="n">continue_session</span><span class="p">,</span>
+            <span class="n">server_url</span><span class="o">=</span><span class="n">server_url</span><span class="p">,</span>
+            <span class="n">user_id</span><span class="o">=</span><span class="n">resolved_user_id</span><span class="p">,</span>
+        <span class="p">)</span>
         <span class="k">await</span> <span class="n">ui</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">connected</span><span class="p">()</span>
 
-        <span class="n">chat_id</span> <span class="o">=</span> <span class="s2">""</span>
-
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"user_id=</span><span class="si">%s</span><span class="s2"> chat_id=</span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="n">user_id</span><span class="p">,</span> <span class="n">chat_id</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"user_id=</span><span class="si">%s</span><span class="s2"> chat_id=</span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="n">resolved_user_id</span><span class="p">,</span> <span class="n">chat_id</span><span class="p">)</span>
 
         <span class="n">page_builder</span><span class="p">(</span>
             <span class="n">chat_id</span><span class="o">=</span><span class="n">chat_id</span><span class="p">,</span>
-            <span class="n">user_id</span><span class="o">=</span><span class="n">user_id</span><span class="p">,</span>
+            <span class="n">user_id</span><span class="o">=</span><span class="n">resolved_user_id</span><span class="p">,</span>
             <span class="n">server_url</span><span class="o">=</span><span class="n">server_url</span><span class="p">,</span>
             <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
             <span class="n">subtitle</span><span class="o">=</span><span class="n">subtitle</span><span class="p">,</span>
@@ -490,7 +553,7 @@
         <span class="n">port</span><span class="o">=</span><span class="n">port</span><span class="p">,</span>
         <span class="n">host</span><span class="o">=</span><span class="n">host</span><span class="p">,</span>
         <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
-        <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">show</span><span class="o">=</span><span class="n">open_browser</span><span class="p">,</span>
         <span class="n">reload</span><span class="o">=</span><span class="n">reload</span><span class="p">,</span>
         <span class="n">storage_secret</span><span class="o">=</span><span class="n">storage_secret</span><span class="p">,</span>
         <span class="n">favicon</span><span class="o">=</span><span class="n">resolved_favicon</span><span class="p">,</span>

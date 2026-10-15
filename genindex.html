@@ -207,6 +207,7 @@
 <li class="toctree-l2"><a class="reference internal" href="components/tools.html">Tools</a></li>
 <li class="toctree-l2"><a class="reference internal" href="components/commands.html">Session commands</a></li>
 <li class="toctree-l2"><a class="reference internal" href="components/web-ui.html">Web interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="components/tui.html">Terminal interface</a></li>
 <li class="toctree-l2"><a class="reference internal" href="components/agent.html">Klea Agent</a></li>
 <li class="toctree-l2"><a class="reference internal" href="components/utils.html">Klea Utils</a></li>
 </ul>
@@ -245,9 +246,10 @@
 <li class="toctree-l3"><a class="reference internal" href="api/utils/mcp.html">MCP utilities</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/utils/models_catalog.html">Model catalog</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/utils/api.html">API</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utils/commands.html">Commands</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="api/utils/ui.html">UI</a><input aria-label="Toggle navigation of UI" class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" role="switch" type="checkbox"/><label for="toctree-checkbox-8"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="api/utils/ui-nicegui.html">UI — NiceGUI</a></li>
-<li class="toctree-l4"><a class="reference internal" href="api/utils/ui-tui.html">UI - terminal REPL</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/utils/ui-tui.html">UI - terminal client</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/utils/ui-cli.html">UI — client CLI</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/utils/ui-stores-create.html">UI — store creation CLI</a></li>
 </ul>
@@ -317,6 +319,8 @@
 </li>
         <li><a href="api/utils/mcp.html#klea_utils.mcp.access.AccessLevel">AccessLevel (in module klea_utils.mcp.access)</a>
 </li>
+        <li><a href="api/utils/api.html#klea_utils.api.sessions_db.SessionStore.add_chat_events">add_chat_events() (klea_utils.api.sessions_db.SessionStore method)</a>
+</li>
         <li><a href="api/utils/llm.html#klea_utils.llm.add_memory_to_prompt">add_memory_to_prompt() (in module klea_utils.llm)</a>
 </li>
         <li><a href="api/utils/api.html#klea_utils.api.sessions_db.SessionStore.add_message">add_message() (klea_utils.api.sessions_db.SessionStore method)</a>
@@ -324,6 +328,8 @@
         <li><a href="api/utils/api.html#klea_utils.api.sessions_db.SessionStore.add_messages">add_messages() (klea_utils.api.sessions_db.SessionStore method)</a>
 </li>
         <li><a href="api/utils/graph.html#klea_utils.graph.reducers.add_token_usage">add_token_usage() (in module klea_utils.graph.reducers)</a>
+</li>
+        <li><a href="api/utils/commands.html#klea_utils.commands.common.CommandRegistry.all">all() (klea_utils.commands.common.CommandRegistry method)</a>
 </li>
         <li><a href="api/utils/api.html#klea_utils.api.sessions_db.SessionStore.all_chat_overrides">all_chat_overrides() (klea_utils.api.sessions_db.SessionStore method)</a>
 </li>
@@ -355,7 +361,7 @@
 </li>
         <li><a href="api/utils/llm.html#klea_utils.llm.apply_provider_overrides">apply_provider_overrides() (in module klea_utils.llm)</a>
 </li>
-        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.components.stream.apply_stream_event">apply_stream_event() (in module klea_utils.ui.web.nicegui.components.stream)</a>
+        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.stream_events.apply_stream_event">apply_stream_event() (in module klea_utils.ui.stream_events)</a>
 </li>
         <li><a href="api/utils/mcp.html#klea_utils.mcp.path_detect.PathRequest.approval_key">approval_key (klea_utils.mcp.path_detect.PathRequest property)</a>
 </li>
@@ -376,6 +382,8 @@
         <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.components.model_dialog.attach_model_info">attach_model_info() (in module klea_utils.ui.web.nicegui.components.model_dialog)</a>
 </li>
         <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.components.status_pane.attach_status_pane">attach_status_pane() (in module klea_utils.ui.web.nicegui.components.status_pane)</a>
+</li>
+        <li><a href="api/utils/commands.html#klea_utils.commands.common.CommandRegistry.available">available() (klea_utils.commands.common.CommandRegistry method)</a>
 </li>
     </ul></td>
   </tr></table>
@@ -411,15 +419,17 @@
 </li>
         <li><a href="api/utils/stores.html#klea_utils.stores.langchain_bm25.BM25Retriever">BM25Retriever (class in klea_utils.stores.langchain_bm25)</a>
 </li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/utils/stores.html#klea_utils.stores.retrieval.bm25.BM25RetrieverManager">BM25RetrieverManager (class in klea_utils.stores.retrieval.bm25)</a>
 </li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/utils/stores.html#klea_utils.stores.config.BM25StoreInfo">BM25StoreInfo (class in klea_utils.stores.config)</a>
 </li>
         <li><a href="api/utils/mcp.html#klea_utils.mcp.tool_impls.file_ops.BOM">BOM (in module klea_utils.mcp.tool_impls.file_ops)</a>
 </li>
         <li><a href="api/utils/mcp.html#klea_utils.mcp.tool_impls.file_ops.TextFile.bom">bom (klea_utils.mcp.tool_impls.file_ops.TextFile attribute)</a>
+</li>
+        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.components.storage.browser_user_id">browser_user_id() (in module klea_utils.ui.web.nicegui.components.storage)</a>
 </li>
         <li><a href="api/utils/ui-stores-create.html#klea_utils.ui.stores_create.build">build() (in module klea_utils.ui.stores_create)</a>
 
@@ -461,13 +471,15 @@
 </li>
         <li><a href="api/utils/api.html#klea_utils.api.chat_common.CancelPayload">CancelPayload (class in klea_utils.api.chat_common)</a>
 </li>
+        <li><a href="api/utils/commands.html#klea_utils.commands.common.CAP_LOCAL_FS">CAP_LOCAL_FS (in module klea_utils.commands.common)</a>
+</li>
         <li><a href="api/utils/api.html#klea_utils.api.sse.CATALOGUE_FETCH_TIMEOUT_SECONDS">CATALOGUE_FETCH_TIMEOUT_SECONDS (in module klea_utils.api.sse)</a>
 </li>
         <li><a href="glossary.html#term-Chat-model"><strong>Chat model</strong></a>
 </li>
         <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.components.context.PageContext.chat_created_hooks">chat_created_hooks (klea_utils.ui.web.nicegui.components.context.PageContext attribute)</a>
 </li>
-        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.state.chat_indicator">chat_indicator() (in module klea_utils.ui.web.nicegui.state)</a>
+        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.state.chat_indicator">chat_indicator() (in module klea_utils.ui.state)</a>
 </li>
         <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.components.context.PageContext.chat_is_streaming">chat_is_streaming() (klea_utils.ui.web.nicegui.components.context.PageContext method)</a>
 </li>
@@ -477,9 +489,9 @@
           <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.widgets.ChatBubble">(class in klea_utils.ui.web.nicegui.widgets)</a>
 </li>
         </ul></li>
-        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.state.ChatData">ChatData (class in klea_utils.ui.web.nicegui.state)</a>
+        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.state.ChatData">ChatData (class in klea_utils.ui.state)</a>
 </li>
-        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.state.ChatIndicator">ChatIndicator (class in klea_utils.ui.web.nicegui.state)</a>
+        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.state.ChatIndicator">ChatIndicator (class in klea_utils.ui.state)</a>
 </li>
         <li><a href="api/utils/api.html#klea_utils.api.utils.check_api_is_ready">check_api_is_ready() (in module klea_utils.api.utils)</a>
 </li>
@@ -509,7 +521,7 @@
 </li>
         <li><a href="api/utils/stores.html#klea_utils.stores.chunk_worker.ChunkWorkerConfig">ChunkWorkerConfig (class in klea_utils.stores.chunk_worker)</a>
 </li>
-        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.state.ChatIndicator.classes">classes (klea_utils.ui.web.nicegui.state.ChatIndicator attribute)</a>
+        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.state.ChatIndicator.classes">classes (klea_utils.ui.state.ChatIndicator attribute)</a>
 </li>
         <li><a href="api/utils/stores.html#klea_utils.stores.precheck.classify_directory">classify_directory() (in module klea_utils.stores.precheck)</a>
 </li>
@@ -523,7 +535,7 @@
 </li>
         <li><a href="api/utils/paths.html#klea_utils.paths.cleanup_dir">cleanup_dir() (in module klea_utils.paths)</a>
 </li>
-        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.client.clear_credential">clear_credential() (in module klea_utils.ui.web.nicegui.client)</a>
+        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.client.clear_credential">clear_credential() (in module klea_utils.ui.client)</a>
 
         <ul>
           <li><a href="api/utils/api.html#klea_utils.api.sessions_db.SessionStore.clear_credential">(klea_utils.api.sessions_db.SessionStore method)</a>
@@ -531,21 +543,23 @@
         </ul></li>
         <li><a href="api/utils/api.html#klea_utils.api.sessions_db.SessionStore.clear_credentials">clear_credentials() (klea_utils.api.sessions_db.SessionStore method)</a>
 </li>
-        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.client.clear_model_override">clear_model_override() (in module klea_utils.ui.web.nicegui.client)</a>
+        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.client.clear_model_override">clear_model_override() (in module klea_utils.ui.client)</a>
 </li>
         <li><a href="api/utils/api.html#klea_utils.api.sessions_db.SessionStore.clear_override">clear_override() (klea_utils.api.sessions_db.SessionStore method)</a>
 </li>
         <li><a href="api/utils/api.html#klea_utils.api.sessions_db.SessionStore.clear_overrides">clear_overrides() (klea_utils.api.sessions_db.SessionStore method)</a>
 </li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.client.clear_session_model_override">clear_session_model_override() (in module klea_utils.ui.web.nicegui.client)</a>
+        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.client.clear_session_model_override">clear_session_model_override() (in module klea_utils.ui.client)</a>
 </li>
         <li><a href="api/utils/api.html#klea_utils.api.sessions_db.SessionStore.clear_session_override">clear_session_override() (klea_utils.api.sessions_db.SessionStore method)</a>
 </li>
         <li><a href="api/utils/api.html#klea_utils.api.sessions_db.SessionStore.clear_session_overrides">clear_session_overrides() (klea_utils.api.sessions_db.SessionStore method)</a>
 </li>
         <li><a href="api/utils/llm.html#klea_utils.llm.clear_structured_output_cache">clear_structured_output_cache() (in module klea_utils.llm)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.components.storage.client_is_loopback">client_is_loopback() (in module klea_utils.ui.web.nicegui.components.storage)</a>
 </li>
         <li><a href="api/utils/api.html#klea_utils.api.sessions_db.SessionStore.close">close() (klea_utils.api.sessions_db.SessionStore method)</a>
 
@@ -557,7 +571,23 @@
 </li>
         <li><a href="glossary.html#term-Collection"><strong>Collection</strong></a>
 </li>
+        <li><a href="api/utils/commands.html#klea_utils.commands.common.Command">Command (class in klea_utils.commands.common)</a>
+</li>
         <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.components.context.PageContext.command_catalogue">command_catalogue (klea_utils.ui.web.nicegui.components.context.PageContext attribute)</a>
+</li>
+        <li><a href="api/utils/commands.html#klea_utils.commands.graph.command_query_router">command_query_router() (in module klea_utils.commands.graph)</a>
+</li>
+        <li><a href="api/utils/commands.html#klea_utils.commands.graph.command_route_router">command_route_router() (in module klea_utils.commands.graph)</a>
+</li>
+        <li><a href="api/utils/commands.html#klea_utils.commands.common.CommandContext">CommandContext (class in klea_utils.commands.common)</a>
+</li>
+        <li><a href="api/utils/commands.html#klea_utils.commands.common.CommandHandler">CommandHandler (in module klea_utils.commands.common)</a>
+</li>
+        <li><a href="api/utils/nodes.html#klea_utils.nodes.command.CommandNode">CommandNode (class in klea_utils.nodes.command)</a>
+</li>
+        <li><a href="api/utils/commands.html#klea_utils.commands.common.CommandRegistry">CommandRegistry (class in klea_utils.commands.common)</a>
+</li>
+        <li><a href="api/utils/commands.html#klea_utils.commands.common.CommandResult">CommandResult (class in klea_utils.commands.common)</a>
 </li>
         <li><a href="api/utils/mcp.html#klea_utils.mcp.path_detect.Confidence">Confidence (in module klea_utils.mcp.path_detect)</a>
 </li>
@@ -572,7 +602,7 @@
         <li><a href="api/utils/models_catalog.html#klea_utils.models_catalog.ModelLimits.context">context (klea_utils.models_catalog.ModelLimits attribute)</a>
 
         <ul>
-          <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.state.ChatData.context">(klea_utils.ui.web.nicegui.state.ChatData attribute)</a>
+          <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.state.ChatData.context">(klea_utils.ui.state.ChatData attribute)</a>
 </li>
         </ul></li>
         <li><a href="api/utils/mcp.html#klea_utils.mcp.tool_impls.edit_replacers.context_aware_replacer">context_aware_replacer() (in module klea_utils.mcp.tool_impls.edit_replacers)</a>
@@ -587,7 +617,7 @@
 </li>
         <li><a href="api/utils/api.html#klea_utils.api.sessions_db.SessionStore.create_chat">create_chat() (klea_utils.api.sessions_db.SessionStore method)</a>
 </li>
-        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.client.create_chat_on_server">create_chat_on_server() (in module klea_utils.ui.web.nicegui.client)</a>
+        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.client.create_chat_on_server">create_chat_on_server() (in module klea_utils.ui.client)</a>
 </li>
         <li><a href="api/utils/llm.html#klea_utils.llm.create_configurable_model">create_configurable_model() (in module klea_utils.llm)</a>
 </li>
@@ -605,7 +635,7 @@
 </li>
         <li><a href="api/utils/api.html#klea_utils.api.sessions.CreateChatPayload">CreateChatPayload (class in klea_utils.api.sessions)</a>
 </li>
-        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.state.ChatData.created">created (klea_utils.ui.web.nicegui.state.ChatData attribute)</a>
+        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.state.ChatData.created">created (klea_utils.ui.state.ChatData attribute)</a>
 </li>
         <li><a href="api/utils/api.html#klea_utils.api.sessions_db.CREDENTIAL_PURGE_INTERVAL_SECONDS">CREDENTIAL_PURGE_INTERVAL_SECONDS (in module klea_utils.api.sessions_db)</a>
 </li>
@@ -693,10 +723,10 @@
 </li>
         <li><a href="api/utils/mcp.html#klea_utils.mcp.tool_impls.rg_backend.DEFAULT_SEARCH_TIMEOUT_SECONDS">DEFAULT_SEARCH_TIMEOUT_SECONDS (in module klea_utils.mcp.tool_impls.rg_backend)</a>
 </li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/utils/plogging.html#klea_utils.plogging.DEFAULT_SENSITIVE_KEYS">DEFAULT_SENSITIVE_KEYS (in module klea_utils.plogging)</a>
 </li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.entry.default_storage_env">default_storage_env() (in module klea_utils.ui.web.nicegui.entry)</a>
 </li>
         <li><a href="api/utils/mcp.html#klea_utils.mcp.tool_impls.run_command.DEFAULT_TIMEOUT_SECONDS">DEFAULT_TIMEOUT_SECONDS (in module klea_utils.mcp.tool_impls.run_command)</a>
@@ -704,8 +734,12 @@
         <li><a href="api/utils/mcp.html#klea_utils.mcp.dispatch.DEFAULT_TOOL_CALL_TIMEOUT_SECONDS">DEFAULT_TOOL_CALL_TIMEOUT_SECONDS (in module klea_utils.mcp.dispatch)</a>
 </li>
         <li><a href="api/utils/api.html#klea_utils.api.sessions_db.SessionStore.delete_chat">delete_chat() (klea_utils.api.sessions_db.SessionStore method)</a>
+
+        <ul>
+          <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.components.context.PageContext.delete_chat">(klea_utils.ui.web.nicegui.components.context.PageContext method)</a>
 </li>
-        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.client.delete_chat_on_server">delete_chat_on_server() (in module klea_utils.ui.web.nicegui.client)</a>
+        </ul></li>
+        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.client.delete_chat_on_server">delete_chat_on_server() (in module klea_utils.ui.client)</a>
 </li>
         <li><a href="api/utils/api.html#klea_utils.api.sessions_db.SessionStore.delete_user_chats">delete_user_chats() (klea_utils.api.sessions_db.SessionStore method)</a>
 </li>
@@ -722,6 +756,8 @@
         <li><a href="api/utils/models_catalog.html#klea_utils.models_catalog.DISK_CACHE_FILE">DISK_CACHE_FILE (in module klea_utils.models_catalog)</a>
 </li>
         <li><a href="api/utils/models_catalog.html#klea_utils.models_catalog.DISK_CACHE_TTL_SECONDS">DISK_CACHE_TTL_SECONDS (in module klea_utils.models_catalog)</a>
+</li>
+        <li><a href="api/utils/commands.html#klea_utils.commands.common.CommandRegistry.dispatch">dispatch() (klea_utils.commands.common.CommandRegistry method)</a>
 </li>
         <li><a href="api/utils/stores.html#klea_utils.stores.chunk_worker.dispatch_conversion_batches">dispatch_conversion_batches() (in module klea_utils.stores.chunk_worker)</a>
 </li>
@@ -787,7 +823,7 @@
 </li>
         <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.components.context.PageContext.ensure_active_chat">ensure_active_chat() (klea_utils.ui.web.nicegui.components.context.PageContext method)</a>
 </li>
-        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.state.ensure_chat">ensure_chat() (in module klea_utils.ui.web.nicegui.state)</a>
+        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.state.ensure_chat">ensure_chat() (in module klea_utils.ui.state)</a>
 </li>
         <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.components.storage.ensure_user_storage">ensure_user_storage() (in module klea_utils.ui.web.nicegui.components.storage)</a>
 </li>
@@ -801,12 +837,12 @@
 </li>
         <li><a href="api/utils/llm.html#klea_utils.llm.escape_prompt_braces">escape_prompt_braces() (in module klea_utils.llm)</a>
 </li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/utils/llm.html#klea_utils.llm.estimate_input_tokens">estimate_input_tokens() (in module klea_utils.llm)</a>
 </li>
         <li><a href="glossary.html#term-Evaluator"><strong>Evaluator</strong></a>
 </li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/utils/mcp.html#klea_utils.mcp.server.config.BundledToolsConfig.exclude_tags">exclude_tags (klea_utils.mcp.server.config.BundledToolsConfig attribute)</a>
 </li>
         <li><a href="api/utils/nodes.html#klea_utils.nodes.abstract.AbstractLangGraphNode.execute">execute() (klea_utils.nodes.abstract.AbstractLangGraphNode method)</a>
@@ -816,6 +852,8 @@
 </li>
           <li><a href="api/utils/nodes.html#klea_utils.nodes.abstract.AbstractRouterNode.execute">(klea_utils.nodes.abstract.AbstractRouterNode method)</a>
 </li>
+          <li><a href="api/utils/nodes.html#klea_utils.nodes.command.CommandNode.execute">(klea_utils.nodes.command.CommandNode method)</a>
+</li>
           <li><a href="api/utils/nodes.html#klea_utils.nodes.fixed_answer.FixedAnswer.execute">(klea_utils.nodes.fixed_answer.FixedAnswer method)</a>
 </li>
           <li><a href="api/utils/nodes.html#klea_utils.nodes.guard_router.GuardRouterNode.execute">(klea_utils.nodes.guard_router.GuardRouterNode method)</a>
@@ -823,9 +861,15 @@
           <li><a href="api/utils/nodes.html#klea_utils.nodes.tools_caller.ToolsCallerNode.execute">(klea_utils.nodes.tools_caller.ToolsCallerNode method)</a>
 </li>
         </ul></li>
+        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.components.context.PageContext.exit_app">exit_app() (klea_utils.ui.web.nicegui.components.context.PageContext method)</a>
+</li>
         <li><a href="api/utils/stores.html#klea_utils.stores.utils.expand_person_names">expand_person_names() (in module klea_utils.stores.utils)</a>
 </li>
-        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.state.ChatData.expanded">expanded (klea_utils.ui.web.nicegui.state.ChatData attribute)</a>
+        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.state.ChatData.expanded">expanded (klea_utils.ui.state.ChatData attribute)</a>
+</li>
+        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.export.export_filename">export_filename() (in module klea_utils.ui.export)</a>
+</li>
+        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.export.export_timestamp">export_timestamp() (in module klea_utils.ui.export)</a>
 </li>
         <li><a href="api/utils/biblio.html#klea_utils.biblio.docling.extract_docling_structured">extract_docling_structured() (in module klea_utils.biblio.docling)</a>
 </li>
@@ -849,6 +893,8 @@
   <h2>F</h2>
   <table style="width: 100%" class="indextable genindextable"><tr>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/utils/commands.html#klea_utils.commands.common.CommandResult.fail">fail() (klea_utils.commands.common.CommandResult class method)</a>
+</li>
         <li><a href="api/utils/nodes.html#klea_utils.nodes.answer_general.FallbackConfig">FallbackConfig (class in klea_utils.nodes.answer_general)</a>
 </li>
         <li><a href="api/utils/api.html#klea_utils.api.sse.fetch_active_models">fetch_active_models() (in module klea_utils.api.sse)</a>
@@ -863,7 +909,15 @@
 </li>
         <li><a href="api/utils/api.html#klea_utils.api.sse.fetch_catalogue_providers_sync">fetch_catalogue_providers_sync() (in module klea_utils.api.sse)</a>
 </li>
-        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.client.fetch_commands">fetch_commands() (in module klea_utils.ui.web.nicegui.client)</a>
+        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.client.fetch_chat_context">fetch_chat_context() (in module klea_utils.ui.client)</a>
+</li>
+        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.client.fetch_chat_events">fetch_chat_events() (in module klea_utils.ui.client)</a>
+</li>
+        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.client.fetch_chat_messages">fetch_chat_messages() (in module klea_utils.ui.client)</a>
+</li>
+        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.client.fetch_chats">fetch_chats() (in module klea_utils.ui.client)</a>
+</li>
+        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.client.fetch_commands">fetch_commands() (in module klea_utils.ui.client)</a>
 </li>
         <li><a href="api/utils/api.html#klea_utils.api.sse.fetch_credentials">fetch_credentials() (in module klea_utils.api.sse)</a>
 </li>
@@ -885,14 +939,14 @@
 </li>
         <li><a href="api/utils/mcp.html#klea_utils.mcp.errors.FileEditError">FileEditError</a>
 </li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/utils/plogging.html#klea_utils.plogging.LoggerInfoFilter.filter">filter() (klea_utils.plogging.LoggerInfoFilter method)</a>
 
         <ul>
           <li><a href="api/utils/plogging.html#klea_utils.plogging.LoggerNotInfoFilter.filter">(klea_utils.plogging.LoggerNotInfoFilter method)</a>
 </li>
         </ul></li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/utils/stores.html#klea_utils.stores.filters.filter_docs_by_metadata">filter_docs_by_metadata() (in module klea_utils.stores.filters)</a>
 </li>
         <li><a href="api/utils/stores.html#klea_utils.stores.config.PerDomainConfig.filter_fields">filter_fields (klea_utils.stores.config.PerDomainConfig attribute)</a>
@@ -933,6 +987,8 @@
 </li>
         <li><a href="api/utils/stores.html#klea_utils.stores.langchain_bm25.BM25Retriever.from_documents">from_documents() (klea_utils.stores.langchain_bm25.BM25Retriever class method)</a>
 </li>
+        <li><a href="api/utils/commands.html#klea_utils.commands.common.Command.from_metadata">from_metadata() (klea_utils.commands.common.Command class method)</a>
+</li>
         <li><a href="api/utils/stores.html#klea_utils.stores.langchain_bm25.BM25Retriever.from_texts">from_texts() (klea_utils.stores.langchain_bm25.BM25Retriever class method)</a>
 </li>
     </ul></td>
@@ -943,6 +999,8 @@
   <h2>G</h2>
   <table style="width: 100%" class="indextable genindextable"><tr>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/utils/commands.html#klea_utils.commands.common.CommandRegistry.get">get() (klea_utils.commands.common.CommandRegistry method)</a>
+</li>
         <li><a href="api/utils/graph.html#klea_utils.graph.base.BaseLangGraph.get_allowed_msgpack_modules">get_allowed_msgpack_modules() (klea_utils.graph.base.BaseLangGraph method)</a>
 </li>
         <li><a href="api/utils/paths.html#klea_utils.paths.get_cache_dir">get_cache_dir() (in module klea_utils.paths)</a>
@@ -951,7 +1009,9 @@
 </li>
         <li><a href="api/utils/api.html#klea_utils.api.sessions_db.SessionStore.get_chat">get_chat() (klea_utils.api.sessions_db.SessionStore method)</a>
 </li>
-        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.state.get_chats_sorted">get_chats_sorted() (in module klea_utils.ui.web.nicegui.state)</a>
+        <li><a href="api/utils/api.html#klea_utils.api.sessions_db.SessionStore.get_chat_events">get_chat_events() (klea_utils.api.sessions_db.SessionStore method)</a>
+</li>
+        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.state.get_chats_sorted">get_chats_sorted() (in module klea_utils.ui.state)</a>
 </li>
         <li><a href="api/utils/paths.html#klea_utils.paths.get_config_dir">get_config_dir() (in module klea_utils.paths)</a>
 </li>
@@ -993,6 +1053,10 @@
 </li>
         <li><a href="api/utils/graph.html#klea_utils.graph.base.BaseLangGraph.graph_stream">graph_stream() (klea_utils.graph.base.BaseLangGraph method)</a>
 </li>
+        <li><a href="api/utils/commands.html#klea_utils.commands.graph.GraphCommandHandler">GraphCommandHandler (in module klea_utils.commands.graph)</a>
+</li>
+        <li><a href="api/utils/commands.html#klea_utils.commands.graph.GraphCommandResult">GraphCommandResult (class in klea_utils.commands.graph)</a>
+</li>
         <li><a href="api/utils/mcp.html#klea_utils.mcp.server.bundled_tools.grep">grep() (in module klea_utils.mcp.server.bundled_tools)</a>
 
         <ul>
@@ -1033,7 +1097,7 @@
 </li>
         <li><a href="api/utils/llm.html#klea_utils.llm.HuggingFaceBackend">HuggingFaceBackend (class in klea_utils.llm)</a>
 </li>
-        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.client.hydrate_chats">hydrate_chats() (in module klea_utils.ui.web.nicegui.client)</a>
+        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.client.hydrate_chats">hydrate_chats() (in module klea_utils.ui.client)</a>
 </li>
     </ul></td>
   </tr></table>
@@ -1043,9 +1107,9 @@
   <h2>I</h2>
   <table style="width: 100%" class="indextable genindextable"><tr>
     <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.state.ChatIndicator.icon">icon (klea_utils.ui.web.nicegui.state.ChatIndicator attribute)</a>
+        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.state.ChatIndicator.icon">icon (klea_utils.ui.state.ChatIndicator attribute)</a>
 </li>
-        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.state.idle_turn_status">idle_turn_status() (in module klea_utils.ui.web.nicegui.state)</a>
+        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.state.idle_turn_status">idle_turn_status() (in module klea_utils.ui.state)</a>
 </li>
         <li><a href="api/utils/stores.html#klea_utils.stores.precheck.IMAGE_PAGE_CHAR_THRESHOLD">IMAGE_PAGE_CHAR_THRESHOLD (in module klea_utils.stores.precheck)</a>
 </li>
@@ -1059,6 +1123,8 @@
 </li>
         <li><a href="api/utils/mcp.html#klea_utils.mcp.tool_impls.edit_replacers.indentation_flexible_replacer">indentation_flexible_replacer() (in module klea_utils.mcp.tool_impls.edit_replacers)</a>
 </li>
+        <li><a href="api/utils/commands.html#klea_utils.commands.common.CommandResult.info">info() (klea_utils.commands.common.CommandResult class method)</a>
+</li>
         <li><a href="api/utils/paths.html#klea_utils.paths.init_dir">init_dir() (in module klea_utils.paths)</a>
 </li>
         <li><a href="api/utils/models_catalog.html#klea_utils.models_catalog.ModelLimits.input">input (klea_utils.models_catalog.ModelLimits attribute)</a>
@@ -1067,25 +1133,25 @@
 </li>
         <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.components.context.PageContext.inspector_container">inspector_container (klea_utils.ui.web.nicegui.components.context.PageContext attribute)</a>
 </li>
-        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.state.ChatData.inspector_entries">inspector_entries (klea_utils.ui.web.nicegui.state.ChatData attribute)</a>
+        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.state.ChatData.inspector_entries">inspector_entries (klea_utils.ui.state.ChatData attribute)</a>
 </li>
-        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.state.ChatData.inspector_expanded">inspector_expanded (klea_utils.ui.web.nicegui.state.ChatData attribute)</a>
+        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.state.ChatData.inspector_expanded">inspector_expanded (klea_utils.ui.state.ChatData attribute)</a>
 </li>
-        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.state.ChatData.inspector_sections_collapsed">inspector_sections_collapsed (klea_utils.ui.web.nicegui.state.ChatData attribute)</a>
+        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.state.ChatData.inspector_sections_collapsed">inspector_sections_collapsed (klea_utils.ui.state.ChatData attribute)</a>
 </li>
-        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.state.InspectorEntry">InspectorEntry (class in klea_utils.ui.web.nicegui.state)</a>
-</li>
-        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.state.InspectorMarker">InspectorMarker (class in klea_utils.ui.web.nicegui.state)</a>
+        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.state.InspectorEntry">InspectorEntry (class in klea_utils.ui.state)</a>
 </li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.state.InspectorMarker">InspectorMarker (class in klea_utils.ui.state)</a>
+</li>
         <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.components.theme.install_theme">install_theme() (in module klea_utils.ui.web.nicegui.components.theme)</a>
 </li>
         <li><a href="api/utils/stores.html#klea_utils.stores.utils.instantiate_vector_store">instantiate_vector_store() (in module klea_utils.stores.utils)</a>
 </li>
-        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.state.ChatData.interrupt">interrupt (klea_utils.ui.web.nicegui.state.ChatData attribute)</a>
+        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.state.ChatData.interrupt">interrupt (klea_utils.ui.state.ChatData attribute)</a>
 </li>
-        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.state.interrupt_display">interrupt_display() (in module klea_utils.ui.web.nicegui.state)</a>
+        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.state.interrupt_display">interrupt_display() (in module klea_utils.ui.state)</a>
 </li>
         <li><a href="api/utils/stores.html#klea_utils.stores.query_schema.IntRange">IntRange (class in klea_utils.stores.query_schema)</a>
 </li>
@@ -1141,7 +1207,9 @@
 </li>
         <li><a href="api/utils/mcp.html#klea_utils.mcp.tool_impls.run_command.KILL_GRACE_SECONDS">KILL_GRACE_SECONDS (in module klea_utils.mcp.tool_impls.run_command)</a>
 </li>
-        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.state.ChatIndicator.kind">kind (klea_utils.ui.web.nicegui.state.ChatIndicator attribute)</a>
+        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.state.ChatIndicator.kind">kind (klea_utils.ui.state.ChatIndicator attribute)</a>
+</li>
+        <li><a href="api/utils/commands.html#klea_utils.commands.common.Klass">Klass (in module klea_utils.commands.common)</a>
 </li>
         <li><a href="api/utils/plogging.html#klea_utils.plogging.KLEA_LOG_LEVEL_ENV">KLEA_LOG_LEVEL_ENV (in module klea_utils.plogging)</a>
 </li>
@@ -1301,6 +1369,20 @@
 
         <ul>
           <li><a href="api/utils/biblio.html#module-klea_utils.biblio.regex">module</a>
+</li>
+        </ul></li>
+        <li>
+    klea_utils.commands.common
+
+        <ul>
+          <li><a href="api/utils/commands.html#module-klea_utils.commands.common">module</a>
+</li>
+        </ul></li>
+        <li>
+    klea_utils.commands.graph
+
+        <ul>
+          <li><a href="api/utils/commands.html#module-klea_utils.commands.graph">module</a>
 </li>
         </ul></li>
         <li>
@@ -1712,6 +1794,13 @@
 </li>
         </ul></li>
         <li>
+    klea_utils.nodes.command
+
+        <ul>
+          <li><a href="api/utils/nodes.html#module-klea_utils.nodes.command">module</a>
+</li>
+        </ul></li>
+        <li>
     klea_utils.nodes.context
 
         <ul>
@@ -1852,6 +1941,20 @@
 </li>
         </ul></li>
         <li>
+    klea_utils.ui.client
+
+        <ul>
+          <li><a href="api/utils/ui-nicegui.html#module-klea_utils.ui.client">module</a>
+</li>
+        </ul></li>
+        <li>
+    klea_utils.ui.export
+
+        <ul>
+          <li><a href="api/utils/ui-nicegui.html#module-klea_utils.ui.export">module</a>
+</li>
+        </ul></li>
+        <li>
     klea_utils.ui.inspect_format
 
         <ul>
@@ -1866,6 +1969,13 @@
 </li>
         </ul></li>
         <li>
+    klea_utils.ui.state
+
+        <ul>
+          <li><a href="api/utils/ui-nicegui.html#module-klea_utils.ui.state">module</a>
+</li>
+        </ul></li>
+        <li>
     klea_utils.ui.stores_create
 
         <ul>
@@ -1873,17 +1983,17 @@
 </li>
         </ul></li>
         <li>
+    klea_utils.ui.stream_events
+
+        <ul>
+          <li><a href="api/utils/ui-nicegui.html#module-klea_utils.ui.stream_events">module</a>
+</li>
+        </ul></li>
+        <li>
     klea_utils.ui.tui.repl
 
         <ul>
           <li><a href="api/utils/ui-tui.html#module-klea_utils.ui.tui.repl">module</a>
-</li>
-        </ul></li>
-        <li>
-    klea_utils.ui.web.nicegui.client
-
-        <ul>
-          <li><a href="api/utils/ui-nicegui.html#module-klea_utils.ui.web.nicegui.client">module</a>
 </li>
         </ul></li>
         <li>
@@ -2020,13 +2130,6 @@
 </li>
         </ul></li>
         <li>
-    klea_utils.ui.web.nicegui.state
-
-        <ul>
-          <li><a href="api/utils/ui-nicegui.html#module-klea_utils.ui.web.nicegui.state">module</a>
-</li>
-        </ul></li>
-        <li>
     klea_utils.ui.web.nicegui.widgets
 
         <ul>
@@ -2048,6 +2151,8 @@
         <li><a href="api/utils/tools.html#klea_utils.tools.last_tool_error_text">last_tool_error_text() (in module klea_utils.tools)</a>
 </li>
         <li><a href="api/utils/mcp.html#klea_utils.mcp.tool_impls.edit_replacers.line_trimmed_replacer">line_trimmed_replacer() (in module klea_utils.mcp.tool_impls.edit_replacers)</a>
+</li>
+        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.linkify.linkify_html">linkify_html() (in module klea_utils.ui.linkify)</a>
 </li>
         <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.linkify.linkify_md">linkify_md() (in module klea_utils.ui.linkify)</a>
 </li>
@@ -2167,9 +2272,11 @@
 </li>
         <li><a href="glossary.html#term-MCP-server"><strong>MCP server</strong></a>
 </li>
-        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.state.MessageData">MessageData (class in klea_utils.ui.web.nicegui.state)</a>
+        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.state.MessageData">MessageData (class in klea_utils.ui.state)</a>
 </li>
-        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.state.ChatData.messages">messages (klea_utils.ui.web.nicegui.state.ChatData attribute)</a>
+        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.state.ChatData.messages">messages (klea_utils.ui.state.ChatData attribute)</a>
+</li>
+        <li><a href="api/utils/commands.html#klea_utils.commands.common.Command.metadata">metadata() (klea_utils.commands.common.Command method)</a>
 </li>
         <li><a href="api/utils/api.html#klea_utils.api.overrides.migrate_legacy_overrides">migrate_legacy_overrides() (in module klea_utils.api.overrides)</a>
 </li>
@@ -2177,7 +2284,7 @@
 </li>
         <li><a href="api/utils/nodes.html#klea_utils.nodes.base.MIN_OUTPUT_TOKENS">MIN_OUTPUT_TOKENS (in module klea_utils.nodes.base)</a>
 </li>
-        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.state.missing_credentials">missing_credentials() (in module klea_utils.ui.web.nicegui.state)</a>
+        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.state.missing_credentials">missing_credentials() (in module klea_utils.ui.state)</a>
 </li>
         <li><a href="api/utils/llm.html#klea_utils.llm.missing_required_roles">missing_required_roles() (in module klea_utils.llm)</a>
 </li>
@@ -2185,7 +2292,7 @@
 </li>
         <li><a href="api/utils/mcp.html#klea_utils.mcp.tool_impls.file_ops.TextFile.mode">mode (klea_utils.mcp.tool_impls.file_ops.TextFile attribute)</a>
 </li>
-        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.state.ChatData.mode_pref">mode_pref (klea_utils.ui.web.nicegui.state.ChatData attribute)</a>
+        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.state.ChatData.mode_pref">mode_pref (klea_utils.ui.state.ChatData attribute)</a>
 </li>
         <li><a href="api/utils/api.html#klea_utils.api.chat_common.CancelPayload.model_config">model_config (klea_utils.api.chat_common.CancelPayload attribute)</a>
 
@@ -2265,7 +2372,7 @@
         </ul></li>
         <li><a href="api/utils/llm.html#klea_utils.llm.HuggingFaceBackend.model_id">model_id (klea_utils.llm.HuggingFaceBackend attribute)</a>
 </li>
-        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.state.ChatData.model_info">model_info (klea_utils.ui.web.nicegui.state.ChatData attribute)</a>
+        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.state.ChatData.model_info">model_info (klea_utils.ui.state.ChatData attribute)</a>
 </li>
         <li><a href="api/utils/llm.html#klea_utils.llm.ParsedModelName.model_name">model_name (klea_utils.llm.ParsedModelName attribute)</a>
 </li>
@@ -2344,6 +2451,10 @@
           <li><a href="api/utils/biblio.html#module-klea_utils.biblio.pdf">klea_utils.biblio.pdf</a>
 </li>
           <li><a href="api/utils/biblio.html#module-klea_utils.biblio.regex">klea_utils.biblio.regex</a>
+</li>
+          <li><a href="api/utils/commands.html#module-klea_utils.commands.common">klea_utils.commands.common</a>
+</li>
+          <li><a href="api/utils/commands.html#module-klea_utils.commands.graph">klea_utils.commands.graph</a>
 </li>
           <li><a href="api/utils/errors.html#module-klea_utils.errors">klea_utils.errors</a>
 </li>
@@ -2461,6 +2572,8 @@
 </li>
           <li><a href="api/utils/nodes.html#module-klea_utils.nodes.base">klea_utils.nodes.base</a>
 </li>
+          <li><a href="api/utils/nodes.html#module-klea_utils.nodes.command">klea_utils.nodes.command</a>
+</li>
           <li><a href="api/utils/nodes.html#module-klea_utils.nodes.context">klea_utils.nodes.context</a>
 </li>
           <li><a href="api/utils/nodes.html#module-klea_utils.nodes.fixed_answer">klea_utils.nodes.fixed_answer</a>
@@ -2501,15 +2614,21 @@
 </li>
           <li><a href="api/utils/ui-cli.html#module-klea_utils.ui.cli">klea_utils.ui.cli</a>
 </li>
+          <li><a href="api/utils/ui-nicegui.html#module-klea_utils.ui.client">klea_utils.ui.client</a>
+</li>
+          <li><a href="api/utils/ui-nicegui.html#module-klea_utils.ui.export">klea_utils.ui.export</a>
+</li>
           <li><a href="api/utils/ui-nicegui.html#module-klea_utils.ui.inspect_format">klea_utils.ui.inspect_format</a>
 </li>
           <li><a href="api/utils/ui-nicegui.html#module-klea_utils.ui.linkify">klea_utils.ui.linkify</a>
 </li>
+          <li><a href="api/utils/ui-nicegui.html#module-klea_utils.ui.state">klea_utils.ui.state</a>
+</li>
           <li><a href="api/utils/ui-stores-create.html#module-klea_utils.ui.stores_create">klea_utils.ui.stores_create</a>
 </li>
-          <li><a href="api/utils/ui-tui.html#module-klea_utils.ui.tui.repl">klea_utils.ui.tui.repl</a>
+          <li><a href="api/utils/ui-nicegui.html#module-klea_utils.ui.stream_events">klea_utils.ui.stream_events</a>
 </li>
-          <li><a href="api/utils/ui-nicegui.html#module-klea_utils.ui.web.nicegui.client">klea_utils.ui.web.nicegui.client</a>
+          <li><a href="api/utils/ui-tui.html#module-klea_utils.ui.tui.repl">klea_utils.ui.tui.repl</a>
 </li>
           <li><a href="api/utils/ui-nicegui.html#module-klea_utils.ui.web.nicegui.components.bootstrap">klea_utils.ui.web.nicegui.components.bootstrap</a>
 </li>
@@ -2549,8 +2668,6 @@
 </li>
           <li><a href="api/utils/ui-nicegui.html#module-klea_utils.ui.web.nicegui.parser">klea_utils.ui.web.nicegui.parser</a>
 </li>
-          <li><a href="api/utils/ui-nicegui.html#module-klea_utils.ui.web.nicegui.state">klea_utils.ui.web.nicegui.state</a>
-</li>
           <li><a href="api/utils/ui-nicegui.html#module-klea_utils.ui.web.nicegui.widgets">klea_utils.ui.web.nicegui.widgets</a>
 </li>
         </ul></li>
@@ -2566,9 +2683,11 @@
   <h2>N</h2>
   <table style="width: 100%" class="indextable genindextable"><tr>
     <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.state.ChatData.name">name (klea_utils.ui.web.nicegui.state.ChatData attribute)</a>
+        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.state.ChatData.name">name (klea_utils.ui.state.ChatData attribute)</a>
 </li>
         <li><a href="api/utils/mcp.html#klea_utils.mcp.tool_impls.list_files.nearby_entries">nearby_entries() (in module klea_utils.mcp.tool_impls.list_files)</a>
+</li>
+        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.components.context.PageContext.new_chat">new_chat() (klea_utils.ui.web.nicegui.components.context.PageContext method)</a>
 </li>
         <li><a href="api/utils/mcp.html#klea_utils.mcp.tool_impls.file_ops.TextFile.newline">newline (klea_utils.mcp.tool_impls.file_ops.TextFile attribute)</a>
 </li>
@@ -2582,10 +2701,10 @@
 </li>
         <li><a href="api/utils/nodes.html#klea_utils.nodes.abstract.NodeStreamData">NodeStreamData (class in klea_utils.nodes.abstract)</a>
 </li>
-        <li><a href="api/utils/nodes.html#klea_utils.nodes.abstract.NodeStreamEvent">NodeStreamEvent (class in klea_utils.nodes.abstract)</a>
-</li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/utils/nodes.html#klea_utils.nodes.abstract.NodeStreamEvent">NodeStreamEvent (class in klea_utils.nodes.abstract)</a>
+</li>
         <li><a href="api/utils/models_catalog.html#klea_utils.models_catalog.NON_CATALOG_PROVIDERS">NON_CATALOG_PROVIDERS (in module klea_utils.models_catalog)</a>
 </li>
         <li><a href="api/utils/stores.html#klea_utils.stores.filters.normalize_config_filters">normalize_config_filters() (in module klea_utils.stores.filters)</a>
@@ -2613,6 +2732,8 @@
   <table style="width: 100%" class="indextable genindextable"><tr>
     <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/utils/stores.html#klea_utils.stores.precheck.OCR_DIR_NAME">OCR_DIR_NAME (in module klea_utils.stores.precheck)</a>
+</li>
+        <li><a href="api/utils/commands.html#klea_utils.commands.common.CommandResult.ok">ok() (klea_utils.commands.common.CommandResult class method)</a>
 </li>
         <li><a href="api/utils/stores.html#klea_utils.stores.precheck.organise_directory">organise_directory() (in module klea_utils.stores.precheck)</a>
 </li>
@@ -2660,9 +2781,13 @@
 </li>
         <li><a href="api/utils/mcp.html#klea_utils.mcp.tool_impls.papers.errors.PaperSourceError">PaperSourceError</a>
 </li>
+        <li><a href="api/utils/commands.html#klea_utils.commands.common.parse_command">parse_command() (in module klea_utils.commands.common)</a>
+</li>
         <li><a href="api/utils/llm.html#klea_utils.llm.parse_model_name">parse_model_name() (in module klea_utils.llm)</a>
 </li>
         <li><a href="api/utils/llm.html#klea_utils.llm.parse_output_with_thought">parse_output_with_thought() (in module klea_utils.llm)</a>
+</li>
+        <li><a href="api/utils/commands.html#klea_utils.commands.common.ParsedCommand">ParsedCommand (class in klea_utils.commands.common)</a>
 </li>
         <li><a href="api/utils/llm.html#klea_utils.llm.ParsedModelName">ParsedModelName (class in klea_utils.llm)</a>
 </li>
@@ -2702,9 +2827,11 @@
 </li>
         <li><a href="api/utils/mcp.html#klea_utils.mcp.tool_impls.permission.permitted_roots">permitted_roots() (in module klea_utils.mcp.tool_impls.permission)</a>
 </li>
+        <li><a href="api/utils/commands.html#klea_utils.commands.common.Persists">Persists (in module klea_utils.commands.common)</a>
+</li>
         <li><a href="api/utils/stores.html#klea_utils.stores.metadata.PERSON_NAME_FILTER_FIELDS">PERSON_NAME_FILTER_FIELDS (in module klea_utils.stores.metadata)</a>
 </li>
-        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.state.ChatData.pinned">pinned (klea_utils.ui.web.nicegui.state.ChatData attribute)</a>
+        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.state.ChatData.pinned">pinned (klea_utils.ui.state.ChatData attribute)</a>
 </li>
         <li><a href="api/utils/ui-stores-create.html#klea_utils.ui.stores_create.pre_check">pre_check() (in module klea_utils.ui.stores_create)</a>
 </li>
@@ -2778,13 +2905,21 @@
 </li>
         <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.components.context.PageContext.refresh_turn_status">refresh_turn_status() (klea_utils.ui.web.nicegui.components.context.PageContext method)</a>
 </li>
+        <li><a href="api/utils/commands.html#klea_utils.commands.common.CommandRegistry.register">register() (klea_utils.commands.common.CommandRegistry method)</a>
+</li>
         <li><a href="api/utils/mcp.html#klea_utils.mcp.registry.register_tools">register_tools() (in module klea_utils.mcp.registry)</a>
 </li>
         <li><a href="api/utils/api.html#klea_utils.api.sessions_db.SessionStore.rename_chat">rename_chat() (klea_utils.api.sessions_db.SessionStore method)</a>
+
+        <ul>
+          <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.components.context.PageContext.rename_chat">(klea_utils.ui.web.nicegui.components.context.PageContext method)</a>
 </li>
-        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.client.rename_chat_on_server">rename_chat_on_server() (in module klea_utils.ui.web.nicegui.client)</a>
+        </ul></li>
+        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.client.rename_chat_on_server">rename_chat_on_server() (in module klea_utils.ui.client)</a>
 </li>
         <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.components.context.PageContext.render_chat_area">render_chat_area() (klea_utils.ui.web.nicegui.components.context.PageContext method)</a>
+</li>
+        <li><a href="api/utils/commands.html#klea_utils.commands.common.render_help">render_help() (in module klea_utils.commands.common)</a>
 </li>
         <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.components.inspector_code.render_inspector_code">render_inspector_code() (in module klea_utils.ui.web.nicegui.components.inspector_code)</a>
 </li>
@@ -2795,6 +2930,8 @@
         <li><a href="api/utils/mcp.html#klea_utils.mcp.tool_impls.edit_replacers.Replacer">Replacer (in module klea_utils.mcp.tool_impls.edit_replacers)</a>
 </li>
         <li><a href="api/utils/mcp.html#klea_utils.mcp.tool_impls.edit_replacers.REPLACERS">REPLACERS (in module klea_utils.mcp.tool_impls.edit_replacers)</a>
+</li>
+        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.stream_events.replay_chat_events">replay_chat_events() (in module klea_utils.ui.stream_events)</a>
 </li>
         <li><a href="api/utils/mcp.html#klea_utils.mcp.tool_impls.repositories.errors.RepositorySourceError">RepositorySourceError</a>
 </li>
@@ -2828,9 +2965,9 @@
     <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/utils/llm.html#klea_utils.llm.resolve_catalog_provider_endpoint">resolve_catalog_provider_endpoint() (in module klea_utils.llm)</a>
 </li>
-        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.state.resolve_chat_choice">resolve_chat_choice() (in module klea_utils.ui.web.nicegui.state)</a>
+        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.state.resolve_chat_choice">resolve_chat_choice() (in module klea_utils.ui.state)</a>
 </li>
-        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.state.resolve_choice">resolve_choice() (in module klea_utils.ui.web.nicegui.state)</a>
+        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.state.resolve_choice">resolve_choice() (in module klea_utils.ui.state)</a>
 </li>
         <li><a href="api/utils/api.html#klea_utils.api.sessions_db.resolve_credential_ttl_seconds">resolve_credential_ttl_seconds() (in module klea_utils.api.sessions_db)</a>
 </li>
@@ -2840,6 +2977,8 @@
 </li>
         <li><a href="api/utils/llm.html#klea_utils.llm.resolve_huggingface_backend">resolve_huggingface_backend() (in module klea_utils.llm)</a>
 </li>
+        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.components.bootstrap.resolve_initial_chat">resolve_initial_chat() (in module klea_utils.ui.web.nicegui.components.bootstrap)</a>
+</li>
         <li><a href="api/utils/llm.html#klea_utils.llm.resolve_langchain_endpoint">resolve_langchain_endpoint() (in module klea_utils.llm)</a>
 </li>
         <li><a href="api/utils/plogging.html#klea_utils.plogging.resolve_log_level">resolve_log_level() (in module klea_utils.plogging)</a>
@@ -2848,13 +2987,17 @@
 </li>
         <li><a href="api/utils/llm.html#klea_utils.llm.resolve_output_token_limit">resolve_output_token_limit() (in module klea_utils.llm)</a>
 </li>
+        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.components.storage.resolve_page_user_id">resolve_page_user_id() (in module klea_utils.ui.web.nicegui.components.storage)</a>
+</li>
         <li><a href="api/utils/mcp.html#klea_utils.mcp.tool_impls.permission.resolve_path">resolve_path() (in module klea_utils.mcp.tool_impls.permission)</a>
+</li>
+        <li><a href="api/utils/mcp.html#klea_utils.mcp.path_detect.resolve_path_arguments">resolve_path_arguments() (in module klea_utils.mcp.path_detect)</a>
 </li>
         <li><a href="api/utils/mcp.html#klea_utils.mcp.tool_impls.rg_backend.resolve_rg">resolve_rg() (in module klea_utils.mcp.tool_impls.rg_backend)</a>
 </li>
-        <li><a href="api/utils/llm.html#klea_utils.llm.resolve_user_agent">resolve_user_agent() (in module klea_utils.llm)</a>
+        <li><a href="api/utils/commands.html#klea_utils.commands.common.resolve_subcommand">resolve_subcommand() (in module klea_utils.commands.common)</a>
 </li>
-        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.components.storage.resolve_user_id">resolve_user_id() (in module klea_utils.ui.web.nicegui.components.storage)</a>
+        <li><a href="api/utils/llm.html#klea_utils.llm.resolve_user_agent">resolve_user_agent() (in module klea_utils.llm)</a>
 </li>
         <li><a href="api/utils/biblio.html#klea_utils.biblio.extract.Resolver">Resolver (class in klea_utils.biblio.extract)</a>
 </li>
@@ -2946,23 +3089,27 @@
 </li>
         <li><a href="api/utils/stores.html#klea_utils.stores.utils.serialize_reference_material">serialize_reference_material() (in module klea_utils.stores.utils)</a>
 </li>
+        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.client.server_message_to_data">server_message_to_data() (in module klea_utils.ui.client)</a>
+</li>
+        <li><a href="api/utils/commands.html#klea_utils.commands.common.CommandContext.service">service() (klea_utils.commands.common.CommandContext method)</a>
+</li>
         <li><a href="api/utils/biblio.html#klea_utils.biblio.doi.DoiResolver.SERVICE_ORDER">SERVICE_ORDER (klea_utils.biblio.doi.DoiResolver attribute)</a>
 </li>
         <li><a href="api/utils/mcp.html#klea_utils.mcp.tool_impls.session.SessionLike">SessionLike (class in klea_utils.mcp.tool_impls.session)</a>
 </li>
         <li><a href="api/utils/api.html#klea_utils.api.sessions_db.SessionStore">SessionStore (class in klea_utils.api.sessions_db)</a>
 </li>
-        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.client.set_credential">set_credential() (in module klea_utils.ui.web.nicegui.client)</a>
+        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.client.set_credential">set_credential() (in module klea_utils.ui.client)</a>
 
         <ul>
           <li><a href="api/utils/api.html#klea_utils.api.sessions_db.SessionStore.set_credential">(klea_utils.api.sessions_db.SessionStore method)</a>
 </li>
         </ul></li>
-        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.client.set_model_override">set_model_override() (in module klea_utils.ui.web.nicegui.client)</a>
+        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.client.set_model_override">set_model_override() (in module klea_utils.ui.client)</a>
 </li>
         <li><a href="api/utils/api.html#klea_utils.api.sessions_db.SessionStore.set_override">set_override() (klea_utils.api.sessions_db.SessionStore method)</a>
 </li>
-        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.client.set_session_model_override">set_session_model_override() (in module klea_utils.ui.web.nicegui.client)</a>
+        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.client.set_session_model_override">set_session_model_override() (in module klea_utils.ui.client)</a>
 </li>
         <li><a href="api/utils/api.html#klea_utils.api.sessions_db.SessionStore.set_session_override">set_session_override() (klea_utils.api.sessions_db.SessionStore method)</a>
 </li>
@@ -2978,6 +3125,10 @@
 </li>
         <li><a href="api/utils/stores.html#klea_utils.stores.metadata.SHARED_DOC_METADATA_KEYS">SHARED_DOC_METADATA_KEYS (in module klea_utils.stores.metadata)</a>
 </li>
+        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.components.context.PageContext.show_model_dialog">show_model_dialog() (klea_utils.ui.web.nicegui.components.context.PageContext method)</a>
+</li>
+        <li><a href="api/utils/commands.html#klea_utils.commands.common.Side">Side (in module klea_utils.commands.common)</a>
+</li>
         <li><a href="api/utils/mcp.html#klea_utils.mcp.tool_impls.edit_replacers.simple_replacer">simple_replacer() (in module klea_utils.mcp.tool_impls.edit_replacers)</a>
 </li>
         <li><a href="api/utils/mcp.html#klea_utils.mcp.tool_impls.edit_replacers.SINGLE_CANDIDATE_SIMILARITY">SINGLE_CANDIDATE_SIMILARITY (in module klea_utils.mcp.tool_impls.edit_replacers)</a>
@@ -2986,6 +3137,8 @@
 </li>
         <li><a href="api/utils/mcp.html#klea_utils.mcp.tool_impls.papers.record.PaperRecord.source">source (klea_utils.mcp.tool_impls.papers.record.PaperRecord attribute)</a>
 </li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/utils/stores.html#klea_utils.stores.retrieval.base.BaseKleaRetriever.source_label">source_label (klea_utils.stores.retrieval.base.BaseKleaRetriever attribute)</a>
 
         <ul>
@@ -2994,8 +3147,6 @@
           <li><a href="api/utils/stores.html#klea_utils.stores.retrieval.vs.VSRetriever.source_label">(klea_utils.stores.retrieval.vs.VSRetriever attribute)</a>
 </li>
         </ul></li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/utils/stores.html#klea_utils.stores.utils.SOURCE_SCORES_KEY">SOURCE_SCORES_KEY (in module klea_utils.stores.utils)</a>
 </li>
         <li><a href="api/utils/api.html#klea_utils.api.server.spawn_server">spawn_server() (in module klea_utils.api.server)</a>
@@ -3014,13 +3165,15 @@
 </li>
         <li><a href="api/utils/mcp.html#klea_utils.mcp.tool_impls.sqlite_query.SQLITE_SUFFIXES">SQLITE_SUFFIXES (in module klea_utils.mcp.tool_impls.sqlite_query)</a>
 </li>
-        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.state.ChatData.state_sections">state_sections (klea_utils.ui.web.nicegui.state.ChatData attribute)</a>
+        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.state.ChatData.state_sections">state_sections (klea_utils.ui.state.ChatData attribute)</a>
 </li>
         <li><a href="api/utils/nodes.html#klea_utils.nodes.context.LLMNodeContext.state_updates">state_updates (klea_utils.nodes.context.LLMNodeContext attribute)</a>
 </li>
-        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.state.StateSection">StateSection (class in klea_utils.ui.web.nicegui.state)</a>
+        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.state.StateSection">StateSection (class in klea_utils.ui.state)</a>
 </li>
         <li><a href="api/utils/mcp.html#klea_utils.mcp.schemas.ToolCallSchema.step">step (klea_utils.mcp.schemas.ToolCallSchema attribute)</a>
+</li>
+        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.components.stream.stop_all_streams">stop_all_streams() (in module klea_utils.ui.web.nicegui.components.stream)</a>
 </li>
         <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.components.stream.stop_stream">stop_stream() (in module klea_utils.ui.web.nicegui.components.stream)</a>
 </li>
@@ -3055,6 +3208,8 @@
         <li><a href="api/utils/biblio.html#klea_utils.biblio.normalize.strip_tags">strip_tags() (in module klea_utils.biblio.normalize)</a>
 </li>
         <li><a href="api/utils/llm.html#klea_utils.llm.structured_output_known_unsupported">structured_output_known_unsupported() (in module klea_utils.llm)</a>
+</li>
+        <li><a href="api/utils/commands.html#klea_utils.commands.common.Subcommand">Subcommand (class in klea_utils.commands.common)</a>
 </li>
         <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.components.context.PageContext.submit_interrupt">submit_interrupt() (klea_utils.ui.web.nicegui.components.context.PageContext method)</a>
 </li>
@@ -3097,13 +3252,13 @@
         <li><a href="api/utils/nodes.html#klea_utils.nodes.context.LLMNodeContext.token_usage">token_usage (klea_utils.nodes.context.LLMNodeContext attribute)</a>
 
         <ul>
-          <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.state.ChatData.token_usage">(klea_utils.ui.web.nicegui.state.ChatData attribute)</a>
+          <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.state.ChatData.token_usage">(klea_utils.ui.state.ChatData attribute)</a>
 </li>
         </ul></li>
         <li><a href="api/utils/graph.html#klea_utils.graph.schemas.TokenUsage">TokenUsage (class in klea_utils.graph.schemas)</a>
 
         <ul>
-          <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.state.TokenUsage">(class in klea_utils.ui.web.nicegui.state)</a>
+          <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.state.TokenUsage">(class in klea_utils.ui.state)</a>
 </li>
         </ul></li>
         <li><a href="api/utils/mcp.html#klea_utils.mcp.dispatch.TOOL_CALL_TIMEOUT_ENV_VAR">TOOL_CALL_TIMEOUT_ENV_VAR (in module klea_utils.mcp.dispatch)</a>
@@ -3114,10 +3269,10 @@
 </li>
         <li><a href="api/utils/mcp.html#klea_utils.mcp.access.tool_permits">tool_permits() (in module klea_utils.mcp.access)</a>
 </li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/utils/mcp.html#klea_utils.mcp.access.ToolAccessOverride">ToolAccessOverride (class in klea_utils.mcp.access)</a>
 </li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/utils/nodes.html#klea_utils.nodes.context.ToolCallerContext">ToolCallerContext (class in klea_utils.nodes.context)</a>
 </li>
         <li><a href="api/utils/mcp.html#klea_utils.mcp.schemas.ToolCallSchema">ToolCallSchema (class in klea_utils.mcp.schemas)</a>
@@ -3136,6 +3291,8 @@
 </li>
         <li><a href="api/utils/api.html#klea_utils.api.sessions_db.SessionStore.touch_credential">touch_credential() (klea_utils.api.sessions_db.SessionStore method)</a>
 </li>
+        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.export.transcript_markdown">transcript_markdown() (in module klea_utils.ui.export)</a>
+</li>
         <li><a href="api/utils/nodes.html#klea_utils.nodes.base.TRANSIENT_RETRY_BACKOFF_S">TRANSIENT_RETRY_BACKOFF_S (in module klea_utils.nodes.base)</a>
 </li>
         <li><a href="api/utils/stores.html#klea_utils.stores.filters.translate_metadata_filter">translate_metadata_filter() (in module klea_utils.stores.filters)</a>
@@ -3150,11 +3307,11 @@
 </li>
         <li><a href="api/utils/nodes.html#klea_utils.nodes.base.TRUNCATION_PHASE2_STEP">TRUNCATION_PHASE2_STEP (in module klea_utils.nodes.base)</a>
 </li>
-        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.state.ChatData.turn_status">turn_status (klea_utils.ui.web.nicegui.state.ChatData attribute)</a>
+        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.state.ChatData.turn_status">turn_status (klea_utils.ui.state.ChatData attribute)</a>
 </li>
         <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.components.context.PageContext.turn_status_label">turn_status_label (klea_utils.ui.web.nicegui.components.context.PageContext attribute)</a>
 </li>
-        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.web.nicegui.state.TurnStatus">TurnStatus (class in klea_utils.ui.web.nicegui.state)</a>
+        <li><a href="api/utils/ui-nicegui.html#klea_utils.ui.state.TurnStatus">TurnStatus (class in klea_utils.ui.state)</a>
 </li>
     </ul></td>
   </tr></table>
@@ -3164,16 +3321,18 @@
   <h2>U</h2>
   <table style="width: 100%" class="indextable genindextable"><tr>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/utils/commands.html#klea_utils.commands.common.unescape_command">unescape_command() (in module klea_utils.commands.common)</a>
+</li>
         <li><a href="api/utils/mcp.html#klea_utils.mcp.tool_impls.file_ops.unified_diff">unified_diff() (in module klea_utils.mcp.tool_impls.file_ops)</a>
 </li>
         <li><a href="api/utils/api.html#klea_utils.api.sessions.UpdateChatPayload">UpdateChatPayload (class in klea_utils.api.sessions)</a>
 </li>
         <li><a href="api/utils/biblio.html#klea_utils.biblio.regex.URL_RE">URL_RE (in module klea_utils.biblio.regex)</a>
 </li>
-        <li><a href="api/utils/stores.html#klea_utils.stores.map_lint.URL_WARN_THRESHOLD">URL_WARN_THRESHOLD (in module klea_utils.stores.map_lint)</a>
-</li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/utils/stores.html#klea_utils.stores.map_lint.URL_WARN_THRESHOLD">URL_WARN_THRESHOLD (in module klea_utils.stores.map_lint)</a>
+</li>
         <li><a href="api/utils/llm.html#klea_utils.llm.CustomEndpoint.use_responses_api">use_responses_api (klea_utils.llm.CustomEndpoint attribute)</a>
 </li>
         <li><a href="api/utils/graph.html#klea_utils.graph.base.BaseLangGraph.user_agent">user_agent (klea_utils.graph.base.BaseLangGraph attribute)</a>
@@ -3228,10 +3387,12 @@
         </ul></li>
         <li><a href="api/utils/mcp.html#klea_utils.mcp.server.bundled_tools.web_search">web_search() (in module klea_utils.mcp.server.bundled_tools)</a>
 </li>
-        <li><a href="api/utils/mcp.html#klea_utils.mcp.tool_impls.edit_replacers.whitespace_normalized_replacer">whitespace_normalized_replacer() (in module klea_utils.mcp.tool_impls.edit_replacers)</a>
+        <li><a href="api/utils/commands.html#klea_utils.commands.common.WhileStreaming">WhileStreaming (in module klea_utils.commands.common)</a>
 </li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/utils/mcp.html#klea_utils.mcp.tool_impls.edit_replacers.whitespace_normalized_replacer">whitespace_normalized_replacer() (in module klea_utils.mcp.tool_impls.edit_replacers)</a>
+</li>
         <li><a href="api/utils/nodes.html#klea_utils.nodes.abstract.AbstractLangGraphNode.write_custom_stream">write_custom_stream() (klea_utils.nodes.abstract.AbstractLangGraphNode method)</a>
 </li>
         <li><a href="api/utils/mcp.html#klea_utils.mcp.server.bundled_tools.write_file">write_file() (in module klea_utils.mcp.server.bundled_tools)</a>

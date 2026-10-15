@@ -17,8 +17,11 @@ Chat
 The chat tab is where questions are asked.  Answers stream in as they are
 generated, and each answer is grounded in the retrieved sources rather
 than the model's memory alone.  Messages render as full-width blocks: the
-user's prompt is tinted, the agent's reply is plain text, and file changes
-the agent makes appear as their own diff blocks before the reply.  Tool
+user's prompt is tinted and shown **verbatim** (no Markdown decoration, so
+underscores, ``#`` and line breaks in URLs, paths or pasted code are
+preserved; bare URLs stay clickable), the agent's reply is rendered as
+Markdown (code blocks, lists, tables), and file changes the agent makes
+appear as their own diff blocks before the reply.  Tool
 results (file-edit diffs, command output) render as compact blocks
 collapsed to a one-line preview that expands on click; an errored tool
 block's title is shown in red.  Long lines wrap, and the input box sits at
@@ -49,6 +52,13 @@ with the commands it handles itself.  A client-side command (such as
 ``/help``) runs in the browser; a server-side command (such as ``/mode``, the
 agent's operating mode) is sent to the agent.  An unknown command is reported
 locally and never sent.  See :doc:`commands` for the list.
+
+``klea web`` opens the interface in your default browser on launch (pass
+``--no-open`` on a headless or remote host), and accepts ``--continue`` or
+``--resume <chat_id>`` to open the most recently updated or a specific session
+on load.  ``/exit`` -- or the header's power button, which confirms first --
+stops the server this client launched, closes any active runs, and closes the
+browser tab on a best-effort basis.
 
 .. figure:: /_static/images/20260916-klea-rag-chat.png
    :alt: Klea RAG web interface chat tab showing a question and a cited answer

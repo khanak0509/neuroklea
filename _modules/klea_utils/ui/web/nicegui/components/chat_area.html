@@ -208,6 +208,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../../../../components/tools.html">Tools</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../../components/commands.html">Session commands</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../../components/web-ui.html">Web interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../components/tui.html">Terminal interface</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../../components/agent.html">Klea Agent</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../../components/utils.html">Klea Utils</a></li>
 </ul>
@@ -246,9 +247,10 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../../../../api/utils/mcp.html">MCP utilities</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../../api/utils/models_catalog.html">Model catalog</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../../api/utils/api.html">API</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../../../api/utils/commands.html">Commands</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../../api/utils/ui.html">UI</a><input aria-label="Toggle navigation of UI" class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" role="switch" type="checkbox"/><label for="toctree-checkbox-8"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../../api/utils/ui-nicegui.html">UI — NiceGUI</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../../../api/utils/ui-tui.html">UI - terminal REPL</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../../api/utils/ui-tui.html">UI - terminal client</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../../api/utils/ui-cli.html">UI — client CLI</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../../api/utils/ui-stores-create.html">UI — store creation CLI</a></li>
 </ul>
@@ -324,10 +326,10 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">klea_utils.llm</span><span class="w"> </span><span class="kn">import</span> <span class="n">missing_required_roles</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">klea_utils.ui.linkify</span><span class="w"> </span><span class="kn">import</span> <span class="n">linkify_md</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">klea_utils.ui.state</span><span class="w"> </span><span class="kn">import</span> <span class="n">TurnStatus</span><span class="p">,</span> <span class="n">chats</span><span class="p">,</span> <span class="n">missing_credentials</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">klea_utils.ui.web.nicegui.components.chat_bubble</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChatBubble</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">klea_utils.ui.web.nicegui.components.choice</span><span class="w"> </span><span class="kn">import</span> <span class="n">choice_buttons</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">klea_utils.ui.web.nicegui.components.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">PageContext</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">klea_utils.ui.web.nicegui.state</span><span class="w"> </span><span class="kn">import</span> <span class="n">TurnStatus</span><span class="p">,</span> <span class="n">chats</span><span class="p">,</span> <span class="n">missing_credentials</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -422,12 +424,22 @@
     <span class="k">with</span> <span class="n">ui</span><span class="o">.</span><span class="n">column</span><span class="p">()</span><span class="o">.</span><span class="n">classes</span><span class="p">(</span><span class="s2">"w-full gap-2 p-3 border border-primary rounded"</span><span class="p">):</span>
         <span class="n">ui</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="n">heading</span><span class="p">)</span><span class="o">.</span><span class="n">classes</span><span class="p">(</span><span class="s2">"text-sm font-bold"</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">kind</span> <span class="o">==</span> <span class="s2">"review"</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">question</span> <span class="o">:=</span> <span class="n">ask</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"question"</span><span class="p">):</span>
+                <span class="n">ui</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="n">question</span><span class="p">)</span><span class="o">.</span><span class="n">classes</span><span class="p">(</span><span class="s2">"text-sm"</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">plan</span> <span class="o">:=</span> <span class="n">ask</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"plan"</span><span class="p">):</span>
                 <span class="n">ui</span><span class="o">.</span><span class="n">code</span><span class="p">(</span><span class="n">plan</span><span class="p">,</span> <span class="n">language</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span><span class="o">.</span><span class="n">classes</span><span class="p">(</span>
                     <span class="s2">"text-xs w-full nicegui-code-noformat"</span>
                 <span class="p">)</span>
-            <span class="k">if</span> <span class="n">question</span> <span class="o">:=</span> <span class="n">ask</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"question"</span><span class="p">):</span>
-                <span class="n">ui</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="n">question</span><span class="p">)</span><span class="o">.</span><span class="n">classes</span><span class="p">(</span><span class="s2">"text-sm"</span><span class="p">)</span>
+            <span class="c1"># A mid-plan checkpoint (ADR-0051) carries the progress made so</span>
+            <span class="c1"># far, so the user reviews the work and not only the plan.  It is a</span>
+            <span class="c1"># concise summary (tool names + outcomes) rendered monospace like</span>
+            <span class="c1"># the plan, so tool names and paths stay literal; the full results</span>
+            <span class="c1"># are in the inspection pane.</span>
+            <span class="k">if</span> <span class="n">progress</span> <span class="o">:=</span> <span class="n">ask</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"progress"</span><span class="p">):</span>
+                <span class="n">ui</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="s2">"Progress"</span><span class="p">)</span><span class="o">.</span><span class="n">classes</span><span class="p">(</span><span class="s2">"text-xs font-bold"</span><span class="p">)</span>
+                <span class="n">ui</span><span class="o">.</span><span class="n">code</span><span class="p">(</span><span class="n">progress</span><span class="p">,</span> <span class="n">language</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span><span class="o">.</span><span class="n">classes</span><span class="p">(</span>
+                    <span class="s2">"text-xs w-full nicegui-code-noformat"</span>
+                <span class="p">)</span>
             <span class="n">feedback</span> <span class="o">=</span> <span class="p">(</span>
                 <span class="n">ui</span><span class="o">.</span><span class="n">textarea</span><span class="p">(</span><span class="n">placeholder</span><span class="o">=</span><span class="s2">"Feedback (required to request changes)"</span><span class="p">)</span>
                 <span class="o">.</span><span class="n">props</span><span class="p">(</span><span class="s2">"outlined autogrow"</span><span class="p">)</span>
@@ -490,6 +502,38 @@
     <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"directory"</span><span class="p">,</span> <span class="s2">""</span><span class="p">))</span>
 
 
+<span class="k">def</span><span class="w"> </span><span class="nf">_permission_hint</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Return the tool-call context for a request (tool, argument, value).</span>
+
+<span class="sd">    Gives the user the tool call behind the ask so they can judge it.  Includes</span>
+<span class="sd">    the confidence tier: a ``guess`` is a heuristic path-like value (e.g. a</span>
+<span class="sd">    regex fragment), which is also the only tier offered the "Not a path"</span>
+<span class="sd">    choice.</span>
+<span class="sd">    """</span>
+    <span class="n">tool</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"tool"</span><span class="p">,</span> <span class="s2">""</span><span class="p">))</span>
+    <span class="n">argument</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"argument"</span><span class="p">,</span> <span class="s2">""</span><span class="p">))</span>
+    <span class="n">confidence</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"confidence"</span><span class="p">,</span> <span class="s2">""</span><span class="p">))</span>
+    <span class="n">raw</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"raw"</span><span class="p">,</span> <span class="s2">""</span><span class="p">))</span>
+    <span class="n">detail</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">tool</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">argument</span><span class="si">}</span><span class="s2"> = </span><span class="si">{</span><span class="n">raw</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">confidence</span><span class="si">}</span><span class="s2">)"</span> <span class="k">if</span> <span class="n">tool</span> <span class="ow">or</span> <span class="n">argument</span> <span class="k">else</span> <span class="s2">""</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"kind"</span><span class="p">)</span> <span class="o">==</span> <span class="s2">"sensitive"</span><span class="p">:</span>
+        <span class="n">note</span> <span class="o">=</span> <span class="s2">"Commonly holds credentials."</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">detail</span><span class="si">}</span><span class="s2"> - </span><span class="si">{</span><span class="n">note</span><span class="si">}</span><span class="s2">"</span> <span class="k">if</span> <span class="n">detail</span> <span class="k">else</span> <span class="n">note</span>
+    <span class="k">return</span> <span class="n">detail</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_permission_options</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Return the per-request decision options.</span>
+
+<span class="sd">    The "Not a path" dismissal is offered only for a ``guess``-tier request,</span>
+<span class="sd">    where the gate may have mistaken a non-path value for a path.</span>
+<span class="sd">    """</span>
+    <span class="n">options</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"once"</span><span class="p">:</span> <span class="s2">"Once"</span><span class="p">,</span> <span class="s2">"session"</span><span class="p">:</span> <span class="s2">"Session"</span><span class="p">}</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"confidence"</span><span class="p">)</span> <span class="o">==</span> <span class="s2">"guess"</span><span class="p">:</span>
+        <span class="n">options</span><span class="p">[</span><span class="s2">"not_a_path"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"Not a path"</span>
+    <span class="n">options</span><span class="p">[</span><span class="s2">"deny"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"Deny"</span>
+    <span class="k">return</span> <span class="n">options</span>
+
+
 <span class="k">def</span><span class="w"> </span><span class="nf">_render_permission_form</span><span class="p">(</span>
     <span class="n">ctx</span><span class="p">:</span> <span class="n">PageContext</span><span class="p">,</span> <span class="n">ask</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">interrupt_id</span><span class="p">:</span> <span class="n">Any</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -526,12 +570,9 @@
                     <span class="k">continue</span>
                 <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"kind"</span><span class="p">)</span> <span class="o">==</span> <span class="s2">"sensitive"</span><span class="p">:</span>
                     <span class="n">title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"Sensitive file: </span><span class="si">{</span><span class="n">request</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'path'</span><span class="p">,</span><span class="w"> </span><span class="s1">''</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
-                    <span class="n">hint</span> <span class="o">=</span> <span class="s2">"Commonly holds credentials."</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"Outside project: </span><span class="si">{</span><span class="n">request</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'directory'</span><span class="p">,</span><span class="w"> </span><span class="s1">''</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
-                    <span class="n">hint</span> <span class="o">=</span> <span class="p">(</span>
-                        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">request</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'tool'</span><span class="p">,</span><span class="w"> </span><span class="s1">''</span><span class="p">)</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">request</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'confidence'</span><span class="p">,</span><span class="w"> </span><span class="s1">''</span><span class="p">)</span><span class="si">}</span><span class="s2">)"</span>
-                    <span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="n">hint</span> <span class="o">=</span> <span class="n">_permission_hint</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
                 <span class="n">key</span> <span class="o">=</span> <span class="n">_permission_key</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
 
                 <span class="k">def</span><span class="w"> </span><span class="nf">_set</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">key</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -540,12 +581,12 @@
 
                 <span class="n">choice_buttons</span><span class="p">(</span>
                     <span class="n">title</span><span class="p">,</span>
-                    <span class="p">{</span><span class="s2">"once"</span><span class="p">:</span> <span class="s2">"Once"</span><span class="p">,</span> <span class="s2">"session"</span><span class="p">:</span> <span class="s2">"Session"</span><span class="p">,</span> <span class="s2">"deny"</span><span class="p">:</span> <span class="s2">"Deny"</span><span class="p">},</span>
+                    <span class="n">_permission_options</span><span class="p">(</span><span class="n">request</span><span class="p">),</span>
                     <span class="n">decisions</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="s2">"deny"</span><span class="p">),</span>
                     <span class="n">_set</span><span class="p">,</span>
-                    <span class="n">colors</span><span class="o">=</span><span class="p">{</span><span class="s2">"deny"</span><span class="p">:</span> <span class="s2">"red-5"</span><span class="p">},</span>
+                    <span class="n">colors</span><span class="o">=</span><span class="p">{</span><span class="s2">"deny"</span><span class="p">:</span> <span class="s2">"red-5"</span><span class="p">,</span> <span class="s2">"not_a_path"</span><span class="p">:</span> <span class="s2">"grey-7"</span><span class="p">},</span>
                     <span class="n">label_width</span><span class="o">=</span><span class="s2">"20ch"</span><span class="p">,</span>
-                    <span class="n">group_width</span><span class="o">=</span><span class="s2">"12rem"</span><span class="p">,</span>
+                    <span class="n">group_width</span><span class="o">=</span><span class="s2">"16rem"</span><span class="p">,</span>
                 <span class="p">)</span>
                 <span class="k">if</span> <span class="n">hint</span><span class="p">:</span>
                     <span class="n">ui</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="n">hint</span><span class="p">)</span><span class="o">.</span><span class="n">classes</span><span class="p">(</span><span class="s2">"text-xs text-grey-6"</span><span class="p">)</span>
@@ -644,10 +685,13 @@
             <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">msg</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">msgs</span><span class="p">):</span>
                 <span class="n">collapsed</span> <span class="o">=</span> <span class="n">idx</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">expanded</span>
                 <span class="n">text</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"text"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
+                <span class="n">role</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"role"</span><span class="p">,</span> <span class="s2">"agent"</span><span class="p">)</span>
                 <span class="n">ChatBubble</span><span class="p">(</span>
-                    <span class="n">text</span><span class="o">=</span><span class="n">linkify_md</span><span class="p">(</span><span class="n">text</span><span class="p">),</span>
+                    <span class="c1"># A user message is rendered verbatim (no markdown), so it</span>
+                    <span class="c1"># is not linkified into markdown links either.</span>
+                    <span class="n">text</span><span class="o">=</span><span class="n">text</span> <span class="k">if</span> <span class="n">role</span> <span class="o">==</span> <span class="s2">"user"</span> <span class="k">else</span> <span class="n">linkify_md</span><span class="p">(</span><span class="n">text</span><span class="p">),</span>
                     <span class="n">stamp</span><span class="o">=</span><span class="n">msg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"stamp"</span><span class="p">,</span> <span class="s2">""</span><span class="p">),</span>
-                    <span class="n">role</span><span class="o">=</span><span class="n">msg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"role"</span><span class="p">,</span> <span class="s2">"agent"</span><span class="p">),</span>
+                    <span class="n">role</span><span class="o">=</span><span class="n">role</span><span class="p">,</span>
                     <span class="n">header</span><span class="o">=</span><span class="n">msg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"header"</span><span class="p">,</span> <span class="s2">""</span><span class="p">),</span>
                     <span class="n">mime</span><span class="o">=</span><span class="n">msg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"mime"</span><span class="p">,</span> <span class="s2">""</span><span class="p">),</span>
                     <span class="n">data</span><span class="o">=</span><span class="n">msg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"data"</span><span class="p">,</span> <span class="s2">""</span><span class="p">),</span>

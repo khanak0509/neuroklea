@@ -3,7 +3,7 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="Klea Agent" href="agent.html"><link rel="prev" title="Session commands" href="commands.html">
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="Terminal interface" href="tui.html"><link rel="prev" title="Session commands" href="commands.html">
         <link rel="prefetch" href="../_static/klea-logo.png" as="image">
 
     <link rel="shortcut icon" href="../_static/klea-logo-notext.png"><!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
@@ -209,6 +209,7 @@
 <li class="toctree-l2"><a class="reference internal" href="tools.html">Tools</a></li>
 <li class="toctree-l2"><a class="reference internal" href="commands.html">Session commands</a></li>
 <li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Web interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tui.html">Terminal interface</a></li>
 <li class="toctree-l2"><a class="reference internal" href="agent.html">Klea Agent</a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html">Klea Utils</a></li>
 </ul>
@@ -247,9 +248,10 @@
 <li class="toctree-l3"><a class="reference internal" href="../api/utils/mcp.html">MCP utilities</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../api/utils/models_catalog.html">Model catalog</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../api/utils/api.html">API</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/utils/commands.html">Commands</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../api/utils/ui.html">UI</a><input aria-label="Toggle navigation of UI" class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" role="switch" type="checkbox"/><label for="toctree-checkbox-8"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../api/utils/ui-nicegui.html">UI — NiceGUI</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../api/utils/ui-tui.html">UI - terminal REPL</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/utils/ui-tui.html">UI - terminal client</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api/utils/ui-cli.html">UI — client CLI</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api/utils/ui-stores-create.html">UI — store creation CLI</a></li>
 </ul>
@@ -327,8 +329,11 @@ disclaimer and the “Powered by” note.</p>
 <p>The chat tab is where questions are asked.  Answers stream in as they are
 generated, and each answer is grounded in the retrieved sources rather
 than the model’s memory alone.  Messages render as full-width blocks: the
-user’s prompt is tinted, the agent’s reply is plain text, and file changes
-the agent makes appear as their own diff blocks before the reply.  Tool
+user’s prompt is tinted and shown <strong>verbatim</strong> (no Markdown decoration, so
+underscores, <code class="docutils literal notranslate"><span class="pre">#</span></code> and line breaks in URLs, paths or pasted code are
+preserved; bare URLs stay clickable), the agent’s reply is rendered as
+Markdown (code blocks, lists, tables), and file changes the agent makes
+appear as their own diff blocks before the reply.  Tool
 results (file-edit diffs, command output) render as compact blocks
 collapsed to a one-line preview that expands on click; an errored tool
 block’s title is shown in red.  Long lines wrap, and the input box sits at
@@ -356,6 +361,12 @@ with the commands it handles itself.  A client-side command (such as
 <code class="docutils literal notranslate"><span class="pre">/help</span></code>) runs in the browser; a server-side command (such as <code class="docutils literal notranslate"><span class="pre">/mode</span></code>, the
 agent’s operating mode) is sent to the agent.  An unknown command is reported
 locally and never sent.  See <a class="reference internal" href="commands.html"><span class="doc">Session commands</span></a> for the list.</p>
+<p><code class="docutils literal notranslate"><span class="pre">klea</span> <span class="pre">web</span></code> opens the interface in your default browser on launch (pass
+<code class="docutils literal notranslate"><span class="pre">--no-open</span></code> on a headless or remote host), and accepts <code class="docutils literal notranslate"><span class="pre">--continue</span></code> or
+<code class="docutils literal notranslate"><span class="pre">--resume</span> <span class="pre">&lt;chat_id&gt;</span></code> to open the most recently updated or a specific session
+on load.  <code class="docutils literal notranslate"><span class="pre">/exit</span></code> – or the header’s power button, which confirms first –
+stops the server this client launched, closes any active runs, and closes the
+browser tab on a best-effort basis.</p>
 <figure class="align-center" id="id1">
 <a class="reference internal image-reference" href="../_images/20260916-klea-rag-chat.png"><img alt="Klea RAG web interface chat tab showing a question and a cited answer" src="../_images/20260916-klea-rag-chat.png" style="width: 80%;" />
 </a>
@@ -435,12 +446,12 @@ query it through this interface</p></li>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="agent.html">
+          <a class="next-page" href="tui.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Klea Agent</div>
+                <div class="title">Terminal interface</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
